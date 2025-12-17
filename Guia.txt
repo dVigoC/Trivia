@@ -1,0 +1,8 @@
+TTRIVIA_APP/
+    -assets/
+        -david.png
+        -elias.png
+        -sanson.png
+    -css/
+    -index.html
+    -preguntas.js

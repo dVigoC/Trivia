@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Bíblica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos comunes */
+        #categoriaSeleccion {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .categoria-card {
+            transition: all 0.3s ease;
+            transform: translateZ(0);
+            will-change: transform;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .categoria-card.selected {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 0 15px rgba(81, 203, 238, 0.6);
+            border: 2px solid rgba(81, 203, 238, 0.6);
+            z-index: 5;
+        }
+        
+        .categoria-img {
+            transition: transform 0.3s ease;
+            transform-origin: center;
+        }
+        
+        #btnEmpezar {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+
+        /* Estilos para respuestas */
+        .respuesta-btn {
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+        
+        .seleccion-jugador1 {
+            position: relative;
+            background-color: rgba(59, 130, 246, 0.3);
+            border: 2px solid rgba(59, 130, 246, 1);
+        }
+        .seleccion-jugador1::after {
+            content: "1";
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(59, 130, 246, 0.9);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid white;
+        }
+        
+        .seleccion-jugador2 {
+            position: relative;
+            background-color: rgba(220, 38, 38, 0.3);
+            border: 2px solid rgba(220, 38, 38, 1);
+        }
+        .seleccion-jugador2::after {
+            content: "2";
+            position: absolute;
+            bottom: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(220, 38, 38, 0.9);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid white;
+        }
+        
+        .seleccion-ambos {
+            position: relative;
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid rgba(59, 130, 246, 1);
+        }
+        .seleccion-ambos::before {
+            content: "1";
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(59, 130, 246, 0.9);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid white;
+        }
+        .seleccion-ambos::after {
+            content: "2";
+            position: absolute;
+            bottom: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(220, 38, 38, 0.9);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid white;
+        }
+        
+        /* Estilo para respuesta correcta */
+        .respuesta-correcta {
+            background-color: rgba(34, 197, 94, 0.5) !important;
+            border: 2px solid rgba(34, 197, 94, 1) !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Selector de modo para móvil */
+        .modo-selector {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .modo-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        
+        .modo-btn.activo {
+            opacity: 1;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        
+        .modo-jugador1 {
+            background-color: rgba(59, 130, 246, 0.7);
+        }
+        
+        .modo-jugador2 {
+            background-color: rgba(220, 38, 38, 0.7);
+        }
+        
+        @media (min-width: 768px) {
+            .modo-selector {
+                display: none;
+            }
+        }
+
+        /* Estilos para resumen final */
+        .trofeo-ganador {
+            font-size: 80px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .puntuacion-card {
+            transition: all 0.3s ease;
+        }
+
+        .puntuacion-card.ganador {
+            transform: scale(1.1);
+            border: 3px solid gold;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Pantalla de selección de categoría -->
+    <div id="categoriaSeleccion" class="text-center w-full max-w-5xl">
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-yellow-400">TRIVIA BÍBLICA</h1>
+        <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
+            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-blue-900 to-gray-900 cursor-pointer" data-categoria="Sanson">
+                <img src="assets/sanson.png" alt="Sansón" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
+                <h3 class="text-xl font-bold text-blue-300 mt-3">SANSÓN</h3>
+                <p class="text-gray-300 text-sm">Nivel Fácil</p>
+            </div>
+            
+            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-purple-900 to-gray-900 cursor-pointer" data-categoria="David">
+                <img src="assets/david.png" alt="David" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
+                <h3 class="text-xl font-bold text-purple-300 mt-3">DAVID</h3>
+                <p class="text-gray-300 text-sm">Nivel Medio</p>
+            </div>
+            
+            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-red-900 to-gray-900 cursor-pointer" data-categoria="Elias">
+                <img src="assets/elias.png" alt="Elías" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
+                <h3 class="text-xl font-bold text-red-300 mt-3">ELÍAS</h3>
+                <p class="text-gray-300 text-sm">Nivel Difícil</p>
+            </div>
+        </div>
+        
+        <button id="btnEmpezar" class="hidden fixed bottom-8 right-8 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-lg font-bold shadow-lg">
+            EMPEZAR
+        </button>
+    </div>
+
+
+    <!-- Pantalla de juego -->
+    <div id="pantallaJuego" class="hidden w-full max-w-3xl text-center relative min-h-[70vh]">
+        <div class="absolute top-4 right-4 bg-gray-800 px-3 py-1 rounded-lg">
+            <span id="contadorPreguntas">Pregunta 1/20</span>
+        </div>
+
+        <!-- Marcadores de puntuación -->
+        <div class="absolute top-4 left-4 flex gap-4">
+            <div class="bg-blue-900 px-4 py-2 rounded-lg">
+                <p class="text-xs text-blue-300">Jugador 1</p>
+                <p class="text-2xl font-bold" id="puntosJ1">0</p>
+            </div>
+            <div class="bg-red-900 px-4 py-2 rounded-lg">
+                <p class="text-xs text-red-300">Jugador 2</p>
+                <p class="text-2xl font-bold" id="puntosJ2">0</p>
+            </div>
+        </div>
+        
+        <div class="mb-8 mt-20 px-4">
+            <h2 id="preguntaTexto" class="text-2xl md:text-3xl font-bold mb-2"></h2>
+        </div>
+        
+        <div id="contenedorRespuestas" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-20 px-4">
+            <!-- Respuestas se generan aquí -->
+        </div>
+        
+        <!-- Selector de modo para móvil -->
+        <div id="modoSelector" class="modo-selector">
+            <button id="modoJugador1Btn" class="modo-btn modo-jugador1 activo">Marcar Jugador 1</button>
+            <button id="modoJugador2Btn" class="modo-btn modo-jugador2">Marcar Jugador 2</button>
+        </div>
+        
+        <div class="fixed bottom-4 left-0 right-0 px-6 flex justify-between">
+            <button id="btnReiniciar" class="px-4 md:px-6 py-2 md:py-3 bg-red-600 rounded-lg font-bold">
+                Reiniciar
+            </button>
+            <div class="flex gap-4">
+                <button id="btnVerificar" class="px-4 md:px-6 py-2 md:py-3 bg-green-600 rounded-lg font-bold">
+                    Verificar
+                </button>
+                <button id="btnContinuar" class="px-4 md:px-6 py-2 md:py-3 bg-yellow-600 rounded-lg font-bold hidden">
+                    Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de resumen final -->
+    <div id="pantallaResumen" class="hidden w-full max-w-4xl text-center">
+        <div class="trofeo-ganador mb-6">🏆</div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-8 text-yellow-400" id="tituloGanador">¡JUGADOR 1 GANA!</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- Card Jugador 1 -->
+            <div id="cardJ1" class="puntuacion-card bg-gradient-to-br from-blue-900 to-gray-900 p-8 rounded-2xl">
+                <div class="text-6xl mb-4">👤</div>
+                <h2 class="text-2xl font-bold text-blue-300 mb-4">JUGADOR 1</h2>
+                <div class="space-y-3">
+                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Respuestas correctas</p>
+                        <p class="text-4xl font-bold text-green-400" id="correctasJ1">0</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Respuestas incorrectas</p>
+                        <p class="text-4xl font-bold text-red-400" id="incorrectasJ1">0</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Precisión</p>
+                        <p class="text-3xl font-bold text-yellow-400" id="precisionJ1">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Jugador 2 -->
+            <div id="cardJ2" class="puntuacion-card bg-gradient-to-br from-red-900 to-gray-900 p-8 rounded-2xl">
+                <div class="text-6xl mb-4">👤</div>
+                <h2 class="text-2xl font-bold text-red-300 mb-4">JUGADOR 2</h2>
+                <div class="space-y-3">
+                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Respuestas correctas</p>
+                        <p class="text-4xl font-bold text-green-400" id="correctasJ2">0</p>
+                    </div>
+                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Respuestas incorrectas</p>
+                        <p class="text-4xl font-bold text-red-400" id="incorrectasJ2">0</p>
+                    </div>
+                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Precisión</p>
+                        <p class="text-3xl font-bold text-yellow-400" id="precisionJ2">0%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-center gap-6">
+            <button id="btnVolverJugar" class="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition-transform">
+                🎮 Jugar de Nuevo
+            </button>
+            <button id="btnCambiarCategoria" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition-transform">
+                🔄 Cambiar Categoría
+            </button>
+        </div>
+    </div>
+
+
+    <script src="preguntas.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Variables de estado
+            let categoriaSeleccionada = null;
+            let preguntasFiltradas = [];
+            let preguntaActual = null;
+            let preguntaIndex = 0;
+            let selecciones = { jugador1: null, jugador2: null };
+            let modoActual = 'jugador1';
+            let puntosJugador1 = 0;
+            let puntosJugador2 = 0;
+            const MAX_PREGUNTAS = 20;
+            const esMovil = window.matchMedia("(max-width: 768px)").matches;
+
+
+            // Elementos DOM
+            const pantallaCategoria = document.getElementById('categoriaSeleccion');
+            const pantallaJuego = document.getElementById('pantallaJuego');
+            const pantallaResumen = document.getElementById('pantallaResumen');
+            const categorias = document.querySelectorAll('.categoria-card');
+            const btnEmpezar = document.getElementById('btnEmpezar');
+            const preguntaTexto = document.getElementById('preguntaTexto');
+            const contenedorRespuestas = document.getElementById('contenedorRespuestas');
+            const contadorPreguntas = document.getElementById('contadorPreguntas');
+            const btnReiniciar = document.getElementById('btnReiniciar');
+            const btnVerificar = document.getElementById('btnVerificar');
+            const btnContinuar = document.getElementById('btnContinuar');
+            const modoJugador1Btn = document.getElementById('modoJugador1Btn');
+            const modoJugador2Btn = document.getElementById('modoJugador2Btn');
+            const puntosJ1Display = document.getElementById('puntosJ1');
+            const puntosJ2Display = document.getElementById('puntosJ2');
+            const btnVolverJugar = document.getElementById('btnVolverJugar');
+            const btnCambiarCategoria = document.getElementById('btnCambiarCategoria');
+
+
+            // Eventos selector de modo (solo móvil)
+            modoJugador1Btn.addEventListener('click', () => {
+                modoActual = 'jugador1';
+                modoJugador1Btn.classList.add('activo');
+                modoJugador2Btn.classList.remove('activo');
+            });
+
+
+            modoJugador2Btn.addEventListener('click', () => {
+                modoActual = 'jugador2';
+                modoJugador2Btn.classList.add('activo');
+                modoJugador1Btn.classList.remove('activo');
+            });
+
+
+            // Selección de categoría
+            categorias.forEach(categoria => {
+                categoria.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    categorias.forEach(c => c.classList.remove('selected'));
+                    categoria.classList.add('selected');
+                    categoriaSeleccionada = categoria.dataset.categoria;
+                    
+                    btnEmpezar.classList.remove('hidden');
+                    btnEmpezar.style.opacity = '0';
+                    btnEmpezar.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        btnEmpezar.style.opacity = '1';
+                        btnEmpezar.style.transform = 'translateY(0)';
+                    }, 10);
+                });
+            });
+
+
+            // Iniciar juego
+            btnEmpezar.addEventListener('click', () => {
+                if (categoriaSeleccionada) {
+                    iniciarJuego();
+                }
+            });
+
+            function iniciarJuego() {
+                // Filtrar preguntas por categoría
+                preguntasFiltradas = preguntas.filter(p => 
+                    p.category === categoriaSeleccionada || 
+                    (categoriaSeleccionada === 'Sanson' && p.category === 'Fácil') ||
+                    (categoriaSeleccionada === 'David' && p.category === 'Medio') ||
+                    (categoriaSeleccionada === 'Elias' && p.category === 'Difícil')
+                );
+                
+                // Mezclar preguntas
+                for (let i = preguntasFiltradas.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [preguntasFiltradas[i], preguntasFiltradas[j]] = [preguntasFiltradas[j], preguntasFiltradas[i]];
+                }
+
+                // LIMITAR A 20 PREGUNTAS
+                preguntasFiltradas = preguntasFiltradas.slice(0, MAX_PREGUNTAS);
+                
+                // Reiniciar puntuación
+                puntosJugador1 = 0;
+                puntosJugador2 = 0;
+                puntosJ1Display.textContent = '0';
+                puntosJ2Display.textContent = '0';
+                
+                pantallaCategoria.classList.add('hidden');
+                pantallaJuego.classList.remove('hidden');
+                preguntaIndex = 0;
+                mostrarPregunta();
+            }
+
+
+            // Mostrar pregunta
+            function mostrarPregunta() {
+                selecciones = { jugador1: null, jugador2: null };
+                preguntaActual = preguntasFiltradas[preguntaIndex];
+                
+                preguntaTexto.textContent = preguntaActual.question;
+                contadorPreguntas.textContent = `Pregunta ${preguntaIndex + 1}/${preguntasFiltradas.length}`;
+                contenedorRespuestas.innerHTML = '';
+                
+                // Mezclar respuestas
+                const respuestasMezcladas = [...preguntaActual.answers];
+                for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [respuestasMezcladas[i], respuestasMezcladas[j]] = [respuestasMezcladas[j], respuestasMezcladas[i]];
+                }
+                
+                // Crear botones de respuesta
+                respuestasMezcladas.forEach((respuesta, i) => {
+                    const boton = document.createElement('button');
+                    boton.className = 'respuesta-btn p-4 bg-gray-800 rounded-lg text-lg mb-2 md:mb-0 hover:bg-gray-700 transition-all';
+                    boton.textContent = `${String.fromCharCode(65 + i)}. ${respuesta.text}`;
+                    boton.dataset.index = i;
+                    boton.dataset.correct = respuesta.correct;
+                    
+                    // Evento único para manejar selecciones
+                    boton.addEventListener('click', (e) => {
+                        if (btnVerificar.classList.contains('hidden')) return;
+                        
+                        if (esMovil) {
+                            // En móvil: alternar selección según el modo activo
+                            selecciones[modoActual] = selecciones[modoActual] === i ? null : i;
+                        } else {
+                            // En desktop: click izquierdo para jugador1
+                            selecciones.jugador1 = selecciones.jugador1 === i ? null : i;
+                        }
+                        actualizarEstilosRespuestas();
+                    });
+                    
+                    // Para desktop: click derecho
+                    if (!esMovil) {
+                        boton.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            if (!btnVerificar.classList.contains('hidden')) {
+                                selecciones.jugador2 = selecciones.jugador2 === i ? null : i;
+                                actualizarEstilosRespuestas();
+                            }
+                        });
+                    }
+                    
+                    contenedorRespuestas.appendChild(boton);
+                });
+                
+                btnVerificar.classList.remove('hidden');
+                btnContinuar.classList.add('hidden');
+            }
+
+
+            // Actualizar estilos de respuestas
+            function actualizarEstilosRespuestas() {
+                document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
+                    // Resetear clases
+                    btn.classList.remove(
+                        'seleccion-jugador1',
+                        'seleccion-jugador2',
+                        'seleccion-ambos'
+                    );
+                    
+                    const esJ1 = selecciones.jugador1 === i;
+                    const esJ2 = selecciones.jugador2 === i;
+                    
+                    // Aplicar clases según selecciones
+                    if (esJ1 && esJ2) {
+                        btn.classList.add('seleccion-ambos');
+                    } else if (esJ1) {
+                        btn.classList.add('seleccion-jugador1');
+                    } else if (esJ2) {
+                        btn.classList.add('seleccion-jugador2');
+                    }
+                });
+            }
+
+
+            // Función para verificar respuesta
+            btnVerificar.addEventListener('click', () => {
+                let respuestaCorrecta = null;
+                
+                document.querySelectorAll('.respuesta-btn').forEach(btn => {
+                    if (btn.dataset.correct === 'true') {
+                        btn.classList.add('respuesta-correcta');
+                        respuestaCorrecta = parseInt(btn.dataset.index);
+                        
+                        // Mantener marcadores de jugador
+                        const index = parseInt(btn.dataset.index);
+                        const esJ1 = selecciones.jugador1 === index;
+                        const esJ2 = selecciones.jugador2 === index;
+                        
+                        if (esJ1 && esJ2) {
+                            btn.classList.add('seleccion-ambos');
+                        } else if (esJ1) {
+                            btn.classList.add('seleccion-jugador1');
+                        } else if (esJ2) {
+                            btn.classList.add('seleccion-jugador2');
+                        }
+                    }
+                });
+
+                // Calcular puntos
+                if (selecciones.jugador1 === respuestaCorrecta) {
+                    puntosJugador1++;
+                    puntosJ1Display.textContent = puntosJugador1;
+                }
+                if (selecciones.jugador2 === respuestaCorrecta) {
+                    puntosJugador2++;
+                    puntosJ2Display.textContent = puntosJugador2;
+                }
+                
+                btnVerificar.classList.add('hidden');
+                btnContinuar.classList.remove('hidden');
+            });
+
+
+            // Continuar a siguiente pregunta
+            btnContinuar.addEventListener('click', () => {
+                preguntaIndex++;
+                if (preguntaIndex < preguntasFiltradas.length) {
+                    mostrarPregunta();
+                } else {
+                    mostrarResumen();
+                }
+            });
+
+
+            // Mostrar resumen final
+            function mostrarResumen() {
+                pantallaJuego.classList.add('hidden');
+                pantallaResumen.classList.remove('hidden');
+
+                const totalPreguntas = preguntasFiltradas.length;
+                const incorrectasJ1 = totalPreguntas - puntosJugador1;
+                const incorrectasJ2 = totalPreguntas - puntosJugador2;
+                const precisionJ1 = Math.round((puntosJugador1 / totalPreguntas) * 100);
+                const precisionJ2 = Math.round((puntosJugador2 / totalPreguntas) * 100);
+
+                // Actualizar estadísticas
+                document.getElementById('correctasJ1').textContent = puntosJugador1;
+                document.getElementById('incorrectasJ1').textContent = incorrectasJ1;
+                document.getElementById('precisionJ1').textContent = precisionJ1 + '%';
+                
+                document.getElementById('correctasJ2').textContent = puntosJugador2;
+                document.getElementById('incorrectasJ2').textContent = incorrectasJ2;
+                document.getElementById('precisionJ2').textContent = precisionJ2 + '%';
+
+                // Determinar ganador
+                const tituloGanador = document.getElementById('tituloGanador');
+                const cardJ1 = document.getElementById('cardJ1');
+                const cardJ2 = document.getElementById('cardJ2');
+
+                cardJ1.classList.remove('ganador');
+                cardJ2.classList.remove('ganador');
+
+                if (puntosJugador1 > puntosJugador2) {
+                    tituloGanador.textContent = '🎉 ¡JUGADOR 1 GANA! 🎉';
+                    cardJ1.classList.add('ganador');
+                } else if (puntosJugador2 > puntosJugador1) {
+                    tituloGanador.textContent = '🎉 ¡JUGADOR 2 GANA! 🎉';
+                    cardJ2.classList.add('ganador');
+                } else {
+                    tituloGanador.textContent = '🤝 ¡EMPATE! 🤝';
+                    cardJ1.classList.add('ganador');
+                    cardJ2.classList.add('ganador');
+                }
+            }
+
+
+            // Volver a jugar (misma categoría)
+            btnVolverJugar.addEventListener('click', () => {
+                pantallaResumen.classList.add('hidden');
+                pantallaJuego.classList.remove('hidden');
+                iniciarJuego();
+            });
+
+
+            // Cambiar categoría
+            btnCambiarCategoria.addEventListener('click', () => {
+                pantallaResumen.classList.add('hidden');
+                pantallaCategoria.classList.remove('hidden');
+                categorias.forEach(c => c.classList.remove('selected'));
+                btnEmpezar.classList.add('hidden');
+                categoriaSeleccionada = null;
+            });
+
+
+            // Reiniciar juego
+            btnReiniciar.addEventListener('click', () => {
+                pantallaJuego.classList.add('hidden');
+                pantallaCategoria.classList.remove('hidden');
+                categorias.forEach(c => c.classList.remove('selected'));
+                btnEmpezar.classList.add('hidden');
+                categoriaSeleccionada = null;
+            });
+        });
+    </script>
+</body>
+</html>
