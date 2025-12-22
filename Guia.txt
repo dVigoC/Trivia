@@ -1,8 +1,14 @@
-TTRIVIA_APP/
-    -assets/
-        -david.png
-        -elias.png
-        -sanson.png
-    -css/
-    -index.html
-    -preguntas.js
+TRIVIA_APP/
+├── assets/
+│   ├── david.png
+│   ├── elias.png
+│   ├── sanson.png
+│   └── sounds/          # NUEVO
+│       ├── tic-tac.mp3
+│       ├── timeout.mp3
+│       ├── correct.mp3
+│       └── wrong.mp3
+├── index.html           # MODIFICADO
+├── preguntas.js         # SIN CAMBIOS
+├── config.js            # NUEVO - Configuración de Supabase
+└── README.md            # NUEVO - Instrucciones de despliegue

@@ -3,9 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trivia Bíblica</title>
+    <title>Trivia Bíblica Multijugador</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
+        /* Prevenir selección de texto en toda la página */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         /* Estilos comunes */
         #categoriaSeleccion {
             position: relative;
@@ -37,11 +50,59 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
+        /* Cronómetro circular */
+        .cronometro-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        .cronometro-circle {
+            transform: rotate(-90deg);
+        }
+
+        .cronometro-bg {
+            fill: none;
+            stroke: #1f2937;
+            stroke-width: 8;
+        }
+
+        .cronometro-progress {
+            fill: none;
+            stroke: #3b82f6;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease;
+        }
+
+        .cronometro-progress.warning {
+            stroke: #f59e0b;
+        }
+
+        .cronometro-progress.danger {
+            stroke: #ef4444;
+        }
+
+        .cronometro-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
 
         /* Estilos para respuestas */
         .respuesta-btn {
             transition: all 0.2s ease;
             touch-action: manipulation;
+        }
+        
+        .respuesta-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
         .seleccion-jugador1 {
@@ -142,47 +203,24 @@
             50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
-        
-        /* Selector de modo para móvil */
-        .modo-selector {
-            position: fixed;
-            bottom: 100px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            z-index: 100;
-        }
-        
-        .modo-btn {
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            opacity: 0.7;
-            transition: all 0.2s;
-        }
-        
-        .modo-btn.activo {
-            opacity: 1;
-            transform: scale(1.1);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
-        }
-        
-        .modo-jugador1 {
-            background-color: rgba(59, 130, 246, 0.7);
-        }
-        
-        .modo-jugador2 {
-            background-color: rgba(220, 38, 38, 0.7);
-        }
-        
-        @media (min-width: 768px) {
-            .modo-selector {
-                display: none;
-            }
+
+        /* Pantalla de lobby */
+        .codigo-sala {
+            font-family: 'Courier New', monospace;
+            font-size: 48px;
+            letter-spacing: 8px;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
 
+        .jugador-conectado {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         /* Estilos para resumen final */
         .trofeo-ganador {
             font-size: 80px;
@@ -203,42 +241,102 @@
             border: 3px solid gold;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
         }
+
+        /* Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-4">
+    
     <!-- Pantalla de selección de categoría -->
     <div id="categoriaSeleccion" class="text-center w-full max-w-5xl">
-        <h1 class="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-yellow-400">TRIVIA BÍBLICA</h1>
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-yellow-400">TRIVIA BÍBLICA MULTIJUGADOR</h1>
         <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
-            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-blue-900 to-gray-900 cursor-pointer" data-categoria="Sanson">
+            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-blue-900 to-gray-900 cursor-pointer" data-categoria="Fácil">
                 <img src="assets/sanson.png" alt="Sansón" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
                 <h3 class="text-xl font-bold text-blue-300 mt-3">SANSÓN</h3>
-                <p class="text-gray-300 text-sm">Nivel Fácil</p>
+                <p class="text-gray-300 text-sm">Nivel Fácil - 10 pts</p>
             </div>
             
-            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-purple-900 to-gray-900 cursor-pointer" data-categoria="David">
+            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-purple-900 to-gray-900 cursor-pointer" data-categoria="Medio">
                 <img src="assets/david.png" alt="David" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
                 <h3 class="text-xl font-bold text-purple-300 mt-3">DAVID</h3>
-                <p class="text-gray-300 text-sm">Nivel Medio</p>
+                <p class="text-gray-300 text-sm">Nivel Medio - 20 pts</p>
             </div>
             
-            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-red-900 to-gray-900 cursor-pointer" data-categoria="Elias">
+            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-red-900 to-gray-900 cursor-pointer" data-categoria="Difícil">
                 <img src="assets/elias.png" alt="Elías" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
                 <h3 class="text-xl font-bold text-red-300 mt-3">ELÍAS</h3>
-                <p class="text-gray-300 text-sm">Nivel Difícil</p>
+                <p class="text-gray-300 text-sm">Nivel Difícil - 50 pts</p>
             </div>
         </div>
         
         <button id="btnEmpezar" class="hidden fixed bottom-8 right-8 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-lg font-bold shadow-lg">
-            EMPEZAR
+            CREAR SALA
         </button>
     </div>
 
+    <!-- Pantalla de Lobby/Sala de Espera -->
+    <div id="pantallaLobby" class="hidden w-full max-w-3xl text-center">
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-yellow-400">SALA DE ESPERA</h1>
+        
+        <div class="bg-gray-900 p-8 rounded-2xl mb-8">
+            <p class="text-gray-400 mb-4">Código de Sala</p>
+            <div class="codigo-sala text-blue-400 mb-6" id="codigoSala">------</div>
+            <p class="text-sm text-gray-500">Comparte este código con tu oponente</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="bg-blue-900 p-6 rounded-xl jugador-conectado">
+                <div class="text-6xl mb-4">👤</div>
+                <p class="text-xl font-bold text-blue-300">Jugador 1</p>
+                <p class="text-sm text-gray-400" id="nombreJ1">Esperando...</p>
+            </div>
+
+            <div class="bg-red-900 p-6 rounded-xl" id="cardJugador2">
+                <div class="text-6xl mb-4">❓</div>
+                <p class="text-xl font-bold text-red-300">Jugador 2</p>
+                <p class="text-sm text-gray-400" id="nombreJ2">Esperando...</p>
+            </div>
+        </div>
+
+        <div id="loaderEspera" class="flex justify-center mb-6">
+            <div class="loader"></div>
+        </div>
+
+        <p class="text-gray-400 mb-8">Esperando que se una el Jugador 2...</p>
+
+        <button id="btnCancelarSala" class="px-6 py-3 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition">
+            Cancelar y Volver
+        </button>
+    </div>
 
     <!-- Pantalla de juego -->
     <div id="pantallaJuego" class="hidden w-full max-w-3xl text-center relative min-h-[70vh]">
         <div class="absolute top-4 right-4 bg-gray-800 px-3 py-1 rounded-lg">
-            <span id="contadorPreguntas">Pregunta 1/20</span>
+            <span id="contadorPreguntas">Pregunta 1/15</span>
+        </div>
+
+        <!-- Cronómetro circular -->
+        <div class="cronometro-container mb-6">
+            <svg class="cronometro-circle" width="100" height="100">
+                <circle class="cronometro-bg" cx="50" cy="50" r="42"></circle>
+                <circle class="cronometro-progress" cx="50" cy="50" r="42" 
+                        stroke-dasharray="264" stroke-dashoffset="0" id="cronometroCircle"></circle>
+            </svg>
+            <div class="cronometro-text" id="cronometroTexto">10</div>
         </div>
 
         <!-- Marcadores de puntuación -->
@@ -253,7 +351,7 @@
             </div>
         </div>
         
-        <div class="mb-8 mt-20 px-4">
+        <div class="mb-8 mt-4 px-4">
             <h2 id="preguntaTexto" class="text-2xl md:text-3xl font-bold mb-2"></h2>
         </div>
         
@@ -261,24 +359,10 @@
             <!-- Respuestas se generan aquí -->
         </div>
         
-        <!-- Selector de modo para móvil -->
-        <div id="modoSelector" class="modo-selector">
-            <button id="modoJugador1Btn" class="modo-btn modo-jugador1 activo">Marcar Jugador 1</button>
-            <button id="modoJugador2Btn" class="modo-btn modo-jugador2">Marcar Jugador 2</button>
-        </div>
-        
-        <div class="fixed bottom-4 left-0 right-0 px-6 flex justify-between">
-            <button id="btnReiniciar" class="px-4 md:px-6 py-2 md:py-3 bg-red-600 rounded-lg font-bold">
-                Reiniciar
+        <div class="fixed bottom-4 left-0 right-0 px-6 flex justify-center">
+            <button id="btnSalirJuego" class="px-4 md:px-6 py-2 md:py-3 bg-red-600 rounded-lg font-bold">
+                Salir del Juego
             </button>
-            <div class="flex gap-4">
-                <button id="btnVerificar" class="px-4 md:px-6 py-2 md:py-3 bg-green-600 rounded-lg font-bold">
-                    Verificar
-                </button>
-                <button id="btnContinuar" class="px-4 md:px-6 py-2 md:py-3 bg-yellow-600 rounded-lg font-bold hidden">
-                    Continuar
-                </button>
-            </div>
         </div>
     </div>
 
@@ -294,16 +378,16 @@
                 <h2 class="text-2xl font-bold text-blue-300 mb-4">JUGADOR 1</h2>
                 <div class="space-y-3">
                     <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Puntos totales</p>
+                        <p class="text-4xl font-bold text-yellow-400" id="puntajeFinalJ1">0</p>
+                    </div>
+                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
                         <p class="text-sm text-gray-300">Respuestas correctas</p>
                         <p class="text-4xl font-bold text-green-400" id="correctasJ1">0</p>
                     </div>
                     <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Respuestas incorrectas</p>
-                        <p class="text-4xl font-bold text-red-400" id="incorrectasJ1">0</p>
-                    </div>
-                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
                         <p class="text-sm text-gray-300">Precisión</p>
-                        <p class="text-3xl font-bold text-yellow-400" id="precisionJ1">0%</p>
+                        <p class="text-3xl font-bold text-purple-400" id="precisionJ1">0%</p>
                     </div>
                 </div>
             </div>
@@ -314,340 +398,581 @@
                 <h2 class="text-2xl font-bold text-red-300 mb-4">JUGADOR 2</h2>
                 <div class="space-y-3">
                     <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300">Puntos totales</p>
+                        <p class="text-4xl font-bold text-yellow-400" id="puntajeFinalJ2">0</p>
+                    </div>
+                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
                         <p class="text-sm text-gray-300">Respuestas correctas</p>
                         <p class="text-4xl font-bold text-green-400" id="correctasJ2">0</p>
                     </div>
                     <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Respuestas incorrectas</p>
-                        <p class="text-4xl font-bold text-red-400" id="incorrectasJ2">0</p>
-                    </div>
-                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
                         <p class="text-sm text-gray-300">Precisión</p>
-                        <p class="text-3xl font-bold text-yellow-400" id="precisionJ2">0%</p>
+                        <p class="text-3xl font-bold text-purple-400" id="precisionJ2">0%</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="flex justify-center gap-6">
-            <button id="btnVolverJugar" class="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition-transform">
-                🎮 Jugar de Nuevo
-            </button>
-            <button id="btnCambiarCategoria" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition-transform">
-                🔄 Cambiar Categoría
+            <button id="btnVolverInicio" class="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition-transform">
+                🏠 Volver al Inicio
             </button>
         </div>
     </div>
 
-
+    <!-- Scripts -->
+    <script src="config.js"></script>
     <script src="preguntas.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
+        // ========================================
+        // INICIALIZACIÓN Y CONFIGURACIÓN
+        // ========================================
+        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        
+        // Sistema de audio
+        const audioSystem = {
+            sounds: {
+                tick: new Audio('assets/sounds/tic-tac.mp3'),
+                timeout: new Audio('assets/sounds/timeout.mp3'),
+                correct: new Audio('assets/sounds/correct.mp3'),
+                wrong: new Audio('assets/sounds/wrong.mp3')
+            },
+            enabled: false,
+            
+            init() {
+                // Habilitar audio tras primera interacción del usuario
+                document.addEventListener('click', () => {
+                    this.enabled = true;
+                }, { once: true });
+            },
+            
+            play(soundName) {
+                if (this.enabled && this.sounds[soundName]) {
+                    this.sounds[soundName].currentTime = 0;
+                    this.sounds[soundName].play().catch(e => console.log('Audio play failed:', e));
+                }
+            },
+            
+            loop(soundName) {
+                if (this.enabled && this.sounds[soundName]) {
+                    this.sounds[soundName].loop = true;
+                    this.sounds[soundName].play().catch(e => console.log('Audio loop failed:', e));
+                }
+            },
+            
+            stop(soundName) {
+                if (this.sounds[soundName]) {
+                    this.sounds[soundName].pause();
+                    this.sounds[soundName].currentTime = 0;
+                    this.sounds[soundName].loop = false;
+                }
+            }
+        };
+
+        // Estado global del juego
+        const gameState = {
+            categoriaSeleccionada: null,
+            salaId: null,
+            jugadorNumero: null,
+            channel: null,
+            preguntasFiltradas: [],
+            preguntaIndex: 0,
+            tiempoRestante: 10,
+            timerInterval: null,
+            puntajes: { jugador1: 0, jugador2: 0 },
+            respuestas: { jugador1: 0, jugador2: 0 },
+            respuestasCorrectas: { jugador1: 0, jugador2: 0 },
+            jugadorListo: false,
+            oponenteListo: false,
+            MAX_PREGUNTAS: 15,
+            TIEMPO_POR_PREGUNTA: 10,
+            PUNTOS_POR_NIVEL: { 'Fácil': 10, 'Medio': 20, 'Difícil': 50 }
+        };
+
+        // Elementos DOM
+        const DOM = {
+            pantallaCategoria: document.getElementById('categoriaSeleccion'),
+            pantallaLobby: document.getElementById('pantallaLobby'),
+            pantallaJuego: document.getElementById('pantallaJuego'),
+            pantallaResumen: document.getElementById('pantallaResumen'),
+            categorias: document.querySelectorAll('.categoria-card'),
+            btnEmpezar: document.getElementById('btnEmpezar'),
+            codigoSala: document.getElementById('codigoSala'),
+            btnCancelarSala: document.getElementById('btnCancelarSala'),
+            preguntaTexto: document.getElementById('preguntaTexto'),
+            contenedorRespuestas: document.getElementById('contenedorRespuestas'),
+            contadorPreguntas: document.getElementById('contadorPreguntas'),
+            cronometroTexto: document.getElementById('cronometroTexto'),
+            cronometroCircle: document.getElementById('cronometroCircle'),
+            puntosJ1: document.getElementById('puntosJ1'),
+            puntosJ2: document.getElementById('puntosJ2'),
+            btnSalirJuego: document.getElementById('btnSalirJuego'),
+            btnVolverInicio: document.getElementById('btnVolverInicio'),
+            cardJugador2: document.getElementById('cardJugador2')
+        };
+
+        // ========================================
+        // FUNCIONES DE SUPABASE Y MULTIJUGADOR
+        // ========================================
+
+        function generarCodigoSala() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        async function crearSala() {
+            const codigo = generarCodigoSala();
+            
+            gameState.salaId = codigo;
+            gameState.jugadorNumero = 1;
+            
+            // Crear canal de Supabase
+            gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
+                config: {
+                    broadcast: { self: true }
+                }
+            });
+
+            // Suscribirse a eventos
+            gameState.channel
+                .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
+                    if (payload.jugador === 2) {
+                        DOM.cardJugador2.classList.add('jugador-conectado');
+                        document.getElementById('nombreJ2').textContent = 'Conectado ✓';
+                        document.getElementById('loaderEspera').classList.add('hidden');
+                        
+                        // Ambos jugadores listos, iniciar juego en 3 segundos
+                        setTimeout(() => {
+                            iniciarJuegoMultijugador();
+                        }, 3000);
+                    }
+                })
+                .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
+                    actualizarRespuestaOponente(payload);
+                })
+                .on('broadcast', { event: 'pregunta-completada' }, ({ payload }) => {
+                    actualizarPuntajesOponente(payload);
+                })
+                .on('broadcast', { event: 'jugador-desconectado' }, () => {
+                    alert('Tu oponente se ha desconectado');
+                    volverAlInicio();
+                })
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        // Notificar que el jugador 1 está conectado
+                        gameState.channel.send({
+                            type: 'broadcast',
+                            event: 'jugador-conectado',
+                            payload: { jugador: 1 }
+                        });
+                    }
+                });
+
+            // Mostrar pantalla de lobby
+            DOM.pantallaCategoria.classList.add('hidden');
+            DOM.pantallaLobby.classList.remove('hidden');
+            DOM.codigoSala.textContent = codigo;
+            document.getElementById('nombreJ1').textContent = 'Conectado ✓';
+        }
+
+        async function unirseASala(codigo) {
+            gameState.salaId = codigo;
+            gameState.jugadorNumero = 2;
+
+            // Crear canal de Supabase
+            gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
+                config: {
+                    broadcast: { self: true }
+                }
+            });
+
+            // Suscribirse a eventos
+            gameState.channel
+                .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
+                    if (payload.jugador === 1) {
+                        document.getElementById('nombreJ1').textContent = 'Conectado ✓';
+                    }
+                })
+                .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
+                    actualizarRespuestaOponente(payload);
+                })
+                .on('broadcast', { event: 'pregunta-completada' }, ({ payload }) => {
+                    actualizarPuntajesOponente(payload);
+                })
+                .on('broadcast', { event: 'iniciar-juego' }, () => {
+                    iniciarJuegoMultijugador();
+                })
+                .on('broadcast', { event: 'jugador-desconectado' }, () => {
+                    alert('Tu oponente se ha desconectado');
+                    volverAlInicio();
+                })
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        // Notificar que el jugador 2 está conectado
+                        gameState.channel.send({
+                            type: 'broadcast',
+                            event: 'jugador-conectado',
+                            payload: { jugador: 2 }
+                        });
+
+                        // Mostrar pantalla de lobby
+                        DOM.pantallaCategoria.classList.add('hidden');
+                        DOM.pantallaLobby.classList.remove('hidden');
+                        DOM.codigoSala.textContent = codigo;
+                        DOM.cardJugador2.classList.add('jugador-conectado');
+                        document.getElementById('nombreJ2').textContent = 'Conectado ✓';
+                        document.getElementById('loaderEspera').classList.add('hidden');
+
+                        // Iniciar juego en 3 segundos
+                        setTimeout(() => {
+                            gameState.channel.send({
+                                type: 'broadcast',
+                                event: 'iniciar-juego',
+                                payload: {}
+                            });
+                        }, 3000);
+                    }
+                });
+        }
+
+        function actualizarRespuestaOponente(payload) {
+            const jugadorOponente = gameState.jugadorNumero === 1 ? 2 : 1;
+            if (payload.jugador === jugadorOponente) {
+                gameState.respuestas[`jugador${jugadorOponente}`] = payload.respuestaIndex;
+                actualizarEstilosRespuestas();
+            }
+        }
+
+        function actualizarPuntajesOponente(payload) {
+            const jugadorOponente = gameState.jugadorNumero === 1 ? 2 : 1;
+            if (payload.jugador === jugadorOponente) {
+                gameState.puntajes[`jugador${jugadorOponente}`] = payload.puntos;
+                gameState.respuestasCorrectas[`jugador${jugadorOponente}`] = payload.correctas;
+                
+                DOM[`puntosJ${jugadorOponente}`].textContent = payload.puntos;
+            }
+        }
+
+        // ========================================
+        // LÓGICA DEL JUEGO
+        // ========================================
+
+        function iniciarJuegoMultijugador() {
+            // Filtrar y mezclar preguntas
+            gameState.preguntasFiltradas = preguntas.filter(p => p.category === gameState.categoriaSeleccionada);
+            
+            for (let i = gameState.preguntasFiltradas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [gameState.preguntasFiltradas[i], gameState.preguntasFiltradas[j]] = 
+                    [gameState.preguntasFiltradas[j], gameState.preguntasFiltradas[i]];
+            }
+
+            gameState.preguntasFiltradas = gameState.preguntasFiltradas.slice(0, gameState.MAX_PREGUNTAS);
+            
+            // Reiniciar estado
+            gameState.preguntaIndex = 0;
+            gameState.puntajes = { jugador1: 0, jugador2: 0 };
+            gameState.respuestasCorrectas = { jugador1: 0, jugador2: 0 };
+            DOM.puntosJ1.textContent = '0';
+            DOM.puntosJ2.textContent = '0';
+            
+            // Mostrar pantalla de juego
+            DOM.pantallaLobby.classList.add('hidden');
+            DOM.pantallaJuego.classList.remove('hidden');
+            
+            mostrarPregunta();
+        }
+
+        function mostrarPregunta() {
+            if (gameState.preguntaIndex >= gameState.preguntasFiltradas.length) {
+                finalizarJuego();
+                return;
+            }
+
+            const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
+            gameState.respuestas = { jugador1: null, jugador2: null };
+            
+            DOM.preguntaTexto.textContent = pregunta.question;
+            DOM.contadorPreguntas.textContent = `Pregunta ${gameState.preguntaIndex + 1}/${gameState.preguntasFiltradas.length}`;
+            DOM.contenedorRespuestas.innerHTML = '';
+            
+            // Mezclar respuestas
+            const respuestasMezcladas = [...pregunta.answers];
+            for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [respuestasMezcladas[i], respuestasMezcladas[j]] = [respuestasMezcladas[j], respuestasMezcladas[i]];
+            }
+            
+            // Crear botones de respuesta
+            respuestasMezcladas.forEach((respuesta, i) => {
+                const boton = document.createElement('button');
+                boton.className = 'respuesta-btn p-4 bg-gray-800 rounded-lg text-lg mb-2 md:mb-0 hover:bg-gray-700 transition-all';
+                boton.textContent = `${String.fromCharCode(65 + i)}. ${respuesta.text}`;
+                boton.dataset.index = i;
+                boton.dataset.correct = respuesta.correct;
+                
+                boton.addEventListener('click', () => seleccionarRespuesta(i));
+                DOM.contenedorRespuestas.appendChild(boton);
+            });
+            
+            iniciarCronometro();
+        }
+
+        function seleccionarRespuesta(index) {
+            const miJugador = `jugador${gameState.jugadorNumero}`;
+            gameState.respuestas[miJugador] = index;
+            
+            // Enviar selección al oponente
+            gameState.channel.send({
+                type: 'broadcast',
+                event: 'respuesta-seleccionada',
+                payload: {
+                    jugador: gameState.jugadorNumero,
+                    respuestaIndex: index
+                }
+            });
+            
+            actualizarEstilosRespuestas();
+        }
+
+        function actualizarEstilosRespuestas() {
+            document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
+                btn.classList.remove('seleccion-jugador1', 'seleccion-jugador2', 'seleccion-ambos');
+                
+                const esJ1 = gameState.respuestas.jugador1 === i;
+                const esJ2 = gameState.respuestas.jugador2 === i;
+                
+                if (esJ1 && esJ2) {
+                    btn.classList.add('seleccion-ambos');
+                } else if (esJ1) {
+                    btn.classList.add('seleccion-jugador1');
+                } else if (esJ2) {
+                    btn.classList.add('seleccion-jugador2');
+                }
+            });
+        }
+
+        function iniciarCronometro() {
+            gameState.tiempoRestante = gameState.TIEMPO_POR_PREGUNTA;
+            actualizarCronometroVisual();
+            audioSystem.loop('tick');
+            
+            gameState.timerInterval = setInterval(() => {
+                gameState.tiempoRestante--;
+                actualizarCronometroVisual();
+                
+                if (gameState.tiempoRestante <= 3) {
+                    DOM.cronometroCircle.classList.add('danger');
+                } else if (gameState.tiempoRestante <= 5) {
+                    DOM.cronometroCircle.classList.add('warning');
+                }
+                
+                if (gameState.tiempoRestante <= 0) {
+                    tiempoAgotado();
+                }
+            }, 1000);
+        }
+
+        function actualizarCronometroVisual() {
+            DOM.cronometroTexto.textContent = gameState.tiempoRestante;
+            const circumference = 264;
+            const offset = circumference - (gameState.tiempoRestante / gameState.TIEMPO_POR_PREGUNTA) * circumference;
+            DOM.cronometroCircle.style.strokeDashoffset = offset;
+        }
+
+        function detenerCronometro() {
+            clearInterval(gameState.timerInterval);
+            audioSystem.stop('tick');
+            DOM.cronometroCircle.classList.remove('warning', 'danger');
+        }
+
+        function tiempoAgotado() {
+            detenerCronometro();
+            audioSystem.play('timeout');
+            
+            // Deshabilitar botones
+            document.querySelectorAll('.respuesta-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            verificarRespuestas();
+        }
+
+        function verificarRespuestas() {
+            detenerCronometro();
+            
+            let respuestaCorrecta = null;
+            const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
+            
+            document.querySelectorAll('.respuesta-btn').forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.correct === 'true') {
+                    btn.classList.add('respuesta-correcta');
+                    respuestaCorrecta = parseInt(btn.dataset.index);
+                }
+            });
+            
+            // Calcular puntos
+            const miJugador = `jugador${gameState.jugadorNumero}`;
+            if (gameState.respuestas[miJugador] === respuestaCorrecta) {
+                const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category];
+                gameState.puntajes[miJugador] += puntos;
+                gameState.respuestasCorrectas[miJugador]++;
+                
+                DOM[`puntosJ${gameState.jugadorNumero}`].textContent = gameState.puntajes[miJugador];
+                audioSystem.play('correct');
+                
+                // Enviar puntaje actualizado
+                gameState.channel.send({
+                    type: 'broadcast',
+                    event: 'pregunta-completada',
+                    payload: {
+                        jugador: gameState.jugadorNumero,
+                        puntos: gameState.puntajes[miJugador],
+                        correctas: gameState.respuestasCorrectas[miJugador]
+                    }
+                });
+            } else {
+                audioSystem.play('wrong');
+            }
+            
+            // Continuar a la siguiente pregunta después de 3 segundos
+            setTimeout(() => {
+                gameState.preguntaIndex++;
+                mostrarPregunta();
+            }, 3000);
+        }
+
+        function finalizarJuego() {
+            DOM.pantallaJuego.classList.add('hidden');
+            DOM.pantallaResumen.classList.remove('hidden');
+            
+            const totalPreguntas = gameState.preguntasFiltradas.length;
+            const puntosJ1 = gameState.puntajes.jugador1;
+            const puntosJ2 = gameState.puntajes.jugador2;
+            const correctasJ1 = gameState.respuestasCorrectas.jugador1;
+            const correctasJ2 = gameState.respuestasCorrectas.jugador2;
+            const precisionJ1 = Math.round((correctasJ1 / totalPreguntas) * 100);
+            const precisionJ2 = Math.round((correctasJ2 / totalPreguntas) * 100);
+            
+            document.getElementById('puntajeFinalJ1').textContent = puntosJ1;
+            document.getElementById('correctasJ1').textContent = correctasJ1;
+            document.getElementById('precisionJ1').textContent = precisionJ1 + '%';
+            
+            document.getElementById('puntajeFinalJ2').textContent = puntosJ2;
+            document.getElementById('correctasJ2').textContent = correctasJ2;
+            document.getElementById('precisionJ2').textContent = precisionJ2 + '%';
+            
+            const cardJ1 = document.getElementById('cardJ1');
+            const cardJ2 = document.getElementById('cardJ2');
+            const tituloGanador = document.getElementById('tituloGanador');
+            
+            cardJ1.classList.remove('ganador');
+            cardJ2.classList.remove('ganador');
+            
+            if (puntosJ1 > puntosJ2) {
+                tituloGanador.textContent = '🎉 ¡JUGADOR 1 GANA! 🎉';
+                cardJ1.classList.add('ganador');
+            } else if (puntosJ2 > puntosJ1) {
+                tituloGanador.textContent = '🎉 ¡JUGADOR 2 GANA! 🎉';
+                cardJ2.classList.add('ganador');
+            } else {
+                tituloGanador.textContent = '🤝 ¡EMPATE! 🤝';
+                cardJ1.classList.add('ganador');
+                cardJ2.classList.add('ganador');
+            }
+            
+            // Desconectar del canal
+            if (gameState.channel) {
+                gameState.channel.unsubscribe();
+            }
+        }
+
+        function volverAlInicio() {
+            // Limpiar estado
+            if (gameState.channel) {
+                gameState.channel.send({
+                    type: 'broadcast',
+                    event: 'jugador-desconectado',
+                    payload: {}
+                });
+                gameState.channel.unsubscribe();
+            }
+            
+            detenerCronometro();
+            
+            gameState.salaId = null;
+            gameState.jugadorNumero = null;
+            gameState.channel = null;
+            gameState.preguntaIndex = 0;
+            
+            DOM.pantallaLobby.classList.add('hidden');
+            DOM.pantallaJuego.classList.add('hidden');
+            DOM.pantallaResumen.classList.add('hidden');
+            DOM.pantallaCategoria.classList.remove('hidden');
+            
+            DOM.categorias.forEach(c => c.classList.remove('selected'));
+            DOM.btnEmpezar.classList.add('hidden');
+            gameState.categoriaSeleccionada = null;
+        }
+
+        // ========================================
+        // EVENTOS DE INTERFAZ
+        // ========================================
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Variables de estado
-            let categoriaSeleccionada = null;
-            let preguntasFiltradas = [];
-            let preguntaActual = null;
-            let preguntaIndex = 0;
-            let selecciones = { jugador1: null, jugador2: null };
-            let modoActual = 'jugador1';
-            let puntosJugador1 = 0;
-            let puntosJugador2 = 0;
-            const MAX_PREGUNTAS = 20;
-            const esMovil = window.matchMedia("(max-width: 768px)").matches;
-
-
-            // Elementos DOM
-            const pantallaCategoria = document.getElementById('categoriaSeleccion');
-            const pantallaJuego = document.getElementById('pantallaJuego');
-            const pantallaResumen = document.getElementById('pantallaResumen');
-            const categorias = document.querySelectorAll('.categoria-card');
-            const btnEmpezar = document.getElementById('btnEmpezar');
-            const preguntaTexto = document.getElementById('preguntaTexto');
-            const contenedorRespuestas = document.getElementById('contenedorRespuestas');
-            const contadorPreguntas = document.getElementById('contadorPreguntas');
-            const btnReiniciar = document.getElementById('btnReiniciar');
-            const btnVerificar = document.getElementById('btnVerificar');
-            const btnContinuar = document.getElementById('btnContinuar');
-            const modoJugador1Btn = document.getElementById('modoJugador1Btn');
-            const modoJugador2Btn = document.getElementById('modoJugador2Btn');
-            const puntosJ1Display = document.getElementById('puntosJ1');
-            const puntosJ2Display = document.getElementById('puntosJ2');
-            const btnVolverJugar = document.getElementById('btnVolverJugar');
-            const btnCambiarCategoria = document.getElementById('btnCambiarCategoria');
-
-
-            // Eventos selector de modo (solo móvil)
-            modoJugador1Btn.addEventListener('click', () => {
-                modoActual = 'jugador1';
-                modoJugador1Btn.classList.add('activo');
-                modoJugador2Btn.classList.remove('activo');
-            });
-
-
-            modoJugador2Btn.addEventListener('click', () => {
-                modoActual = 'jugador2';
-                modoJugador2Btn.classList.add('activo');
-                modoJugador1Btn.classList.remove('activo');
-            });
-
-
+            audioSystem.init();
+            
             // Selección de categoría
-            categorias.forEach(categoria => {
+            DOM.categorias.forEach(categoria => {
                 categoria.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    categorias.forEach(c => c.classList.remove('selected'));
+                    DOM.categorias.forEach(c => c.classList.remove('selected'));
                     categoria.classList.add('selected');
-                    categoriaSeleccionada = categoria.dataset.categoria;
+                    gameState.categoriaSeleccionada = categoria.dataset.categoria;
                     
-                    btnEmpezar.classList.remove('hidden');
-                    btnEmpezar.style.opacity = '0';
-                    btnEmpezar.style.transform = 'translateY(10px)';
+                    DOM.btnEmpezar.classList.remove('hidden');
+                    DOM.btnEmpezar.style.opacity = '0';
+                    DOM.btnEmpezar.style.transform = 'translateY(10px)';
                     setTimeout(() => {
-                        btnEmpezar.style.opacity = '1';
-                        btnEmpezar.style.transform = 'translateY(0)';
+                        DOM.btnEmpezar.style.opacity = '1';
+                        DOM.btnEmpezar.style.transform = 'translateY(0)';
                     }, 10);
                 });
             });
-
-
-            // Iniciar juego
-            btnEmpezar.addEventListener('click', () => {
-                if (categoriaSeleccionada) {
-                    iniciarJuego();
-                }
-            });
-
-            function iniciarJuego() {
-                // Filtrar preguntas por categoría
-                preguntasFiltradas = preguntas.filter(p => 
-                    p.category === categoriaSeleccionada || 
-                    (categoriaSeleccionada === 'Sanson' && p.category === 'Fácil') ||
-                    (categoriaSeleccionada === 'David' && p.category === 'Medio') ||
-                    (categoriaSeleccionada === 'Elias' && p.category === 'Difícil')
-                );
-                
-                // Mezclar preguntas
-                for (let i = preguntasFiltradas.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [preguntasFiltradas[i], preguntasFiltradas[j]] = [preguntasFiltradas[j], preguntasFiltradas[i]];
-                }
-
-                // LIMITAR A 20 PREGUNTAS
-                preguntasFiltradas = preguntasFiltradas.slice(0, MAX_PREGUNTAS);
-                
-                // Reiniciar puntuación
-                puntosJugador1 = 0;
-                puntosJugador2 = 0;
-                puntosJ1Display.textContent = '0';
-                puntosJ2Display.textContent = '0';
-                
-                pantallaCategoria.classList.add('hidden');
-                pantallaJuego.classList.remove('hidden');
-                preguntaIndex = 0;
-                mostrarPregunta();
-            }
-
-
-            // Mostrar pregunta
-            function mostrarPregunta() {
-                selecciones = { jugador1: null, jugador2: null };
-                preguntaActual = preguntasFiltradas[preguntaIndex];
-                
-                preguntaTexto.textContent = preguntaActual.question;
-                contadorPreguntas.textContent = `Pregunta ${preguntaIndex + 1}/${preguntasFiltradas.length}`;
-                contenedorRespuestas.innerHTML = '';
-                
-                // Mezclar respuestas
-                const respuestasMezcladas = [...preguntaActual.answers];
-                for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [respuestasMezcladas[i], respuestasMezcladas[j]] = [respuestasMezcladas[j], respuestasMezcladas[i]];
-                }
-                
-                // Crear botones de respuesta
-                respuestasMezcladas.forEach((respuesta, i) => {
-                    const boton = document.createElement('button');
-                    boton.className = 'respuesta-btn p-4 bg-gray-800 rounded-lg text-lg mb-2 md:mb-0 hover:bg-gray-700 transition-all';
-                    boton.textContent = `${String.fromCharCode(65 + i)}. ${respuesta.text}`;
-                    boton.dataset.index = i;
-                    boton.dataset.correct = respuesta.correct;
+            
+            // Crear sala
+            DOM.btnEmpezar.addEventListener('click', () => {
+                if (gameState.categoriaSeleccionada) {
+                    const accion = prompt('Escribe "CREAR" para crear una sala o ingresa el código de sala para unirte:');
                     
-                    // Evento único para manejar selecciones
-                    boton.addEventListener('click', (e) => {
-                        if (btnVerificar.classList.contains('hidden')) return;
-                        
-                        if (esMovil) {
-                            // En móvil: alternar selección según el modo activo
-                            selecciones[modoActual] = selecciones[modoActual] === i ? null : i;
+                    if (accion) {
+                        if (accion.toUpperCase() === 'CREAR') {
+                            crearSala();
+                        } else if (accion.length === 6) {
+                            unirseASala(accion.toUpperCase());
                         } else {
-                            // En desktop: click izquierdo para jugador1
-                            selecciones.jugador1 = selecciones.jugador1 === i ? null : i;
-                        }
-                        actualizarEstilosRespuestas();
-                    });
-                    
-                    // Para desktop: click derecho
-                    if (!esMovil) {
-                        boton.addEventListener('contextmenu', (e) => {
-                            e.preventDefault();
-                            if (!btnVerificar.classList.contains('hidden')) {
-                                selecciones.jugador2 = selecciones.jugador2 === i ? null : i;
-                                actualizarEstilosRespuestas();
-                            }
-                        });
-                    }
-                    
-                    contenedorRespuestas.appendChild(boton);
-                });
-                
-                btnVerificar.classList.remove('hidden');
-                btnContinuar.classList.add('hidden');
-            }
-
-
-            // Actualizar estilos de respuestas
-            function actualizarEstilosRespuestas() {
-                document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
-                    // Resetear clases
-                    btn.classList.remove(
-                        'seleccion-jugador1',
-                        'seleccion-jugador2',
-                        'seleccion-ambos'
-                    );
-                    
-                    const esJ1 = selecciones.jugador1 === i;
-                    const esJ2 = selecciones.jugador2 === i;
-                    
-                    // Aplicar clases según selecciones
-                    if (esJ1 && esJ2) {
-                        btn.classList.add('seleccion-ambos');
-                    } else if (esJ1) {
-                        btn.classList.add('seleccion-jugador1');
-                    } else if (esJ2) {
-                        btn.classList.add('seleccion-jugador2');
-                    }
-                });
-            }
-
-
-            // Función para verificar respuesta
-            btnVerificar.addEventListener('click', () => {
-                let respuestaCorrecta = null;
-                
-                document.querySelectorAll('.respuesta-btn').forEach(btn => {
-                    if (btn.dataset.correct === 'true') {
-                        btn.classList.add('respuesta-correcta');
-                        respuestaCorrecta = parseInt(btn.dataset.index);
-                        
-                        // Mantener marcadores de jugador
-                        const index = parseInt(btn.dataset.index);
-                        const esJ1 = selecciones.jugador1 === index;
-                        const esJ2 = selecciones.jugador2 === index;
-                        
-                        if (esJ1 && esJ2) {
-                            btn.classList.add('seleccion-ambos');
-                        } else if (esJ1) {
-                            btn.classList.add('seleccion-jugador1');
-                        } else if (esJ2) {
-                            btn.classList.add('seleccion-jugador2');
+                            alert('Código inválido. Debe tener 6 caracteres.');
                         }
                     }
-                });
-
-                // Calcular puntos
-                if (selecciones.jugador1 === respuestaCorrecta) {
-                    puntosJugador1++;
-                    puntosJ1Display.textContent = puntosJugador1;
-                }
-                if (selecciones.jugador2 === respuestaCorrecta) {
-                    puntosJugador2++;
-                    puntosJ2Display.textContent = puntosJugador2;
-                }
-                
-                btnVerificar.classList.add('hidden');
-                btnContinuar.classList.remove('hidden');
-            });
-
-
-            // Continuar a siguiente pregunta
-            btnContinuar.addEventListener('click', () => {
-                preguntaIndex++;
-                if (preguntaIndex < preguntasFiltradas.length) {
-                    mostrarPregunta();
-                } else {
-                    mostrarResumen();
                 }
             });
-
-
-            // Mostrar resumen final
-            function mostrarResumen() {
-                pantallaJuego.classList.add('hidden');
-                pantallaResumen.classList.remove('hidden');
-
-                const totalPreguntas = preguntasFiltradas.length;
-                const incorrectasJ1 = totalPreguntas - puntosJugador1;
-                const incorrectasJ2 = totalPreguntas - puntosJugador2;
-                const precisionJ1 = Math.round((puntosJugador1 / totalPreguntas) * 100);
-                const precisionJ2 = Math.round((puntosJugador2 / totalPreguntas) * 100);
-
-                // Actualizar estadísticas
-                document.getElementById('correctasJ1').textContent = puntosJugador1;
-                document.getElementById('incorrectasJ1').textContent = incorrectasJ1;
-                document.getElementById('precisionJ1').textContent = precisionJ1 + '%';
-                
-                document.getElementById('correctasJ2').textContent = puntosJugador2;
-                document.getElementById('incorrectasJ2').textContent = incorrectasJ2;
-                document.getElementById('precisionJ2').textContent = precisionJ2 + '%';
-
-                // Determinar ganador
-                const tituloGanador = document.getElementById('tituloGanador');
-                const cardJ1 = document.getElementById('cardJ1');
-                const cardJ2 = document.getElementById('cardJ2');
-
-                cardJ1.classList.remove('ganador');
-                cardJ2.classList.remove('ganador');
-
-                if (puntosJugador1 > puntosJugador2) {
-                    tituloGanador.textContent = '🎉 ¡JUGADOR 1 GANA! 🎉';
-                    cardJ1.classList.add('ganador');
-                } else if (puntosJugador2 > puntosJugador1) {
-                    tituloGanador.textContent = '🎉 ¡JUGADOR 2 GANA! 🎉';
-                    cardJ2.classList.add('ganador');
-                } else {
-                    tituloGanador.textContent = '🤝 ¡EMPATE! 🤝';
-                    cardJ1.classList.add('ganador');
-                    cardJ2.classList.add('ganador');
+            
+            // Cancelar sala
+            DOM.btnCancelarSala.addEventListener('click', volverAlInicio);
+            
+            // Salir del juego
+            DOM.btnSalirJuego.addEventListener('click', () => {
+                if (confirm('¿Seguro que deseas salir del juego?')) {
+                    volverAlInicio();
                 }
-            }
-
-
-            // Volver a jugar (misma categoría)
-            btnVolverJugar.addEventListener('click', () => {
-                pantallaResumen.classList.add('hidden');
-                pantallaJuego.classList.remove('hidden');
-                iniciarJuego();
             });
-
-
-            // Cambiar categoría
-            btnCambiarCategoria.addEventListener('click', () => {
-                pantallaResumen.classList.add('hidden');
-                pantallaCategoria.classList.remove('hidden');
-                categorias.forEach(c => c.classList.remove('selected'));
-                btnEmpezar.classList.add('hidden');
-                categoriaSeleccionada = null;
-            });
-
-
-            // Reiniciar juego
-            btnReiniciar.addEventListener('click', () => {
-                pantallaJuego.classList.add('hidden');
-                pantallaCategoria.classList.remove('hidden');
-                categorias.forEach(c => c.classList.remove('selected'));
-                btnEmpezar.classList.add('hidden');
-                categoriaSeleccionada = null;
-            });
+            
+            // Volver al inicio desde resumen
+            DOM.btnVolverInicio.addEventListener('click', volverAlInicio);
         });
     </script>
 </body>
