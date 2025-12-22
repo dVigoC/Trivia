@@ -12,3 +12,21 @@ TRIVIA_APP/
 ├── preguntas.js         # SIN CAMBIOS
 ├── config.js            # NUEVO - Configuración de Supabase
 └── README.md            # NUEVO - Instrucciones de despliegue
+
+# Inicializa el repositorio local
+git init
+
+# Agrega todos los archivos al área de preparación
+git add .
+
+# Crea tu primer commit
+git commit -m "Primer commit: Proyecto Trivia"
+
+# Cambia el nombre de la rama principal a 'main' (estándar de GitHub)
+git branch -M main
+
+# Conecta tu repositorio local con el de GitHub
+git remote add origin https://github.com/dVigoC/Trivia.git
+
+# Sube tus archivos (es posible que te pida tus credenciales)
+git push -u origin main
