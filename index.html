@@ -1,1134 +1,1407 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trivia Bíblica Multijugador</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <style>
-        * {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trivia Bíblica Multijugador</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        input {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
-        }
+    input {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
 
-        #categoriaSeleccion {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .categoria-card {
-            transition: all 0.3s ease;
-            transform: translateZ(0);
-            will-change: transform;
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .categoria-card.selected {
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: 0 0 15px rgba(81, 203, 238, 0.6);
-            border: 2px solid rgba(81, 203, 238, 0.6);
-            z-index: 5;
-        }
-        
-        .categoria-img {
-            transition: transform 0.3s ease;
-            transform-origin: center;
-        }
+    .categoriaSeleccion {
+      position: relative;
+      overflow: hidden;
+    }
 
-        .cronometro-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto;
-        }
+    .categoria-card {
+      transition: all 0.3s ease;
+      transform: translateZ(0);
+      will-change: transform;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+    }
 
-        .cronometro-circle {
-            transform: rotate(-90deg);
-        }
+    .categoria-card.selected {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 0 15px rgba(81, 203, 238, 0.6);
+      border: 2px solid rgba(81, 203, 238, 0.6);
+      z-index: 5;
+    }
 
-        .cronometro-bg {
-            fill: none;
-            stroke: #1f2937;
-            stroke-width: 10;
-        }
+    .categoria-img {
+      transition: transform 0.3s ease;
+      transform-origin: center;
+    }
 
-        .cronometro-progress {
-            fill: none;
-            stroke: #3b82f6;
-            stroke-width: 10;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease;
-        }
+    .cronometro-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+    }
 
-        .cronometro-progress.warning {
-            stroke: #f59e0b;
-        }
+    .cronometro-circle {
+      transform: rotate(-90deg);
+    }
 
-        .cronometro-progress.danger {
-            stroke: #ef4444;
-        }
+    .cronometro-bg {
+      fill: none;
+      stroke: #1f2937;
+      stroke-width: 10;
+    }
 
-        .cronometro-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 48px;
-            font-weight: bold;
-            color: white;
-        }
+    .cronometro-progress {
+      fill: none;
+      stroke: #3b82f6;
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease;
+    }
 
-        .respuesta-btn {
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-        }
-        
-        .respuesta-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .seleccion-jugador1 {
-            position: relative;
-            background-color: rgba(59, 130, 246, 0.3);
-            border: 2px solid rgba(59, 130, 246, 1);
-        }
-        .seleccion-jugador1::after {
-            content: "1";
-            position: absolute;
-            top: -8px;
-            left: -8px;
-            width: 28px;
-            height: 28px;
-            background-color: rgba(59, 130, 246, 0.9);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-        }
-        
-        .seleccion-jugador2 {
-            position: relative;
-            background-color: rgba(220, 38, 38, 0.3);
-            border: 2px solid rgba(220, 38, 38, 1);
-        }
-        .seleccion-jugador2::after {
-            content: "2";
-            position: absolute;
-            bottom: -8px;
-            right: -8px;
-            width: 28px;
-            height: 28px;
-            background-color: rgba(220, 38, 38, 0.9);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-        }
-        
-        .seleccion-ambos {
-            position: relative;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 50%, rgba(220, 38, 38, 0.3) 50%);
-            border: 2px solid rgba(147, 51, 234, 1);
-        }
-        .seleccion-ambos::before {
-            content: "1";
-            position: absolute;
-            top: -8px;
-            left: -8px;
-            width: 28px;
-            height: 28px;
-            background-color: rgba(59, 130, 246, 0.9);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-        }
-        .seleccion-ambos::after {
-            content: "2";
-            position: absolute;
-            bottom: -8px;
-            right: -8px;
-            width: 28px;
-            height: 28px;
-            background-color: rgba(220, 38, 38, 0.9);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 16px;
-            border: 2px solid white;
-        }
-        
-        .respuesta-correcta {
-            background-color: rgba(34, 197, 94, 0.5) !important;
-            border: 2px solid rgba(34, 197, 94, 1) !important;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
+    .cronometro-progress.warning {
+      stroke: #f59e0b;
+    }
 
-        .codigo-sala {
-            font-family: 'Courier New', monospace;
-            font-size: 48px;
-            letter-spacing: 8px;
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
+    .cronometro-progress.danger {
+      stroke: #ef4444;
+    }
 
-        .jugador-conectado {
-            animation: fadeIn 0.5s ease;
-        }
+    .cronometro-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .trofeo-ganador {
-            font-size: 80px;
-            animation: bounce 2s infinite;
-        }
+    .respuesta-btn {
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
+    .respuesta-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-        .puntuacion-card {
-            transition: all 0.3s ease;
-        }
+    .seleccion-jugador1 {
+      position: relative;
+      background-color: rgba(59, 130, 246, 0.3);
+      border: 2px solid rgba(59, 130, 246, 1);
+    }
 
-        .puntuacion-card.ganador {
-            transform: scale(1.1);
-            border: 3px solid gold;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-        }
+    .seleccion-jugador1::after {
+      content: "1";
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      width: 28px;
+      height: 28px;
+      background-color: rgba(59, 130, 246, 0.9);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      border: 2px solid white;
+    }
 
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
+    .seleccion-jugador2 {
+      position: relative;
+      background-color: rgba(220, 38, 38, 0.3);
+      border: 2px solid rgba(220, 38, 38, 1);
+    }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+    .seleccion-jugador2::after {
+      content: "2";
+      position: absolute;
+      bottom: -8px;
+      right: -8px;
+      width: 28px;
+      height: 28px;
+      background-color: rgba(220, 38, 38, 0.9);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      border: 2px solid white;
+    }
 
-        .admin-badge {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #000;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
-            margin-left: 8px;
-        }
+    .seleccion-ambos {
+      position: relative;
+      background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.3) 50%,
+        rgba(220, 38, 38, 0.3) 50%
+      );
+      border: 2px solid rgba(147, 51, 234, 1);
+    }
 
-        .rol-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
+    .seleccion-ambos::before {
+      content: "1";
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      width: 28px;
+      height: 28px;
+      background-color: rgba(59, 130, 246, 0.9);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      border: 2px solid white;
+    }
 
-        .rol-card {
-            background: linear-gradient(135deg, #1e293b, #334155);
-            border-radius: 15px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
+    .seleccion-ambos::after {
+      content: "2";
+      position: absolute;
+      bottom: -8px;
+      right: -8px;
+      width: 28px;
+      height: 28px;
+      background-color: rgba(220, 38, 38, 0.9);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      border: 2px solid white;
+    }
 
-        .rol-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
+    .respuesta-correcta {
+      background-color: rgba(34, 197, 94, 0.5) !important;
+      border: 2px solid rgba(34, 197, 94, 1) !important;
+      animation: pulse 1.5s infinite;
+    }
 
-        .rol-card.admin {
-            border-color: #fbbf24;
-        }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
 
-        .rol-card.jugador {
-            border-color: #3b82f6;
-        }
+    .codigo-sala {
+      font-family: "Courier New", monospace;
+      font-size: 48px;
+      letter-spacing: 8px;
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
 
-        .nombre-jugador-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-left: 4px;
-        }
+    .jugador-conectado {
+      animation: fadeIn 0.5s ease;
+    }
 
-        .nombre-jugador-badge.j1 {
-            background-color: rgba(59, 130, 246, 0.3);
-            color: #60a5fa;
-            border: 1px solid #3b82f6;
-        }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-        .nombre-jugador-badge.j2 {
-            background-color: rgba(220, 38, 38, 0.3);
-            color: #f87171;
-            border: 1px solid #dc2626;
-        }
-    </style>
+    .trofeo-ganador {
+      font-size: 80px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .puntuacion-card {
+      transition: all 0.3s ease;
+    }
+
+    .puntuacion-card.ganador {
+      transform: scale(1.1);
+      border: 3px solid gold;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .admin-badge {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 12px;
+      display: inline-block;
+      margin-left: 8px;
+    }
+
+    .rol-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .rol-card {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      border-radius: 15px;
+      padding: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .rol-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .rol-card.admin {
+      border-color: #fbbf24;
+    }
+
+    .rol-card.jugador {
+      border-color: #3b82f6;
+    }
+
+    .nombre-jugador-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 4px;
+    }
+
+    .nombre-jugador-badge.j1 {
+      background-color: rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      border: 1px solid #3b82f6;
+    }
+
+    .nombre-jugador-badge.j2 {
+      background-color: rgba(220, 38, 38, 0.3);
+      color: #f87171;
+      border: 1px solid #dc2626;
+    }
+  </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-4">
-    
-    <!-- Pantalla de selección de ROL -->
-    <div id="pantallaRol" class="text-center w-full max-w-4xl">
-        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-yellow-400">TRIVIA BÍBLICA MULTIJUGADOR</h1>
-        <p class="text-gray-400 mb-8">Selecciona tu rol para comenzar</p>
-        
-        <div class="rol-selector">
-            <div class="rol-card admin" id="btnRolAdmin">
-                <div class="text-6xl mb-4">👑</div>
-                <h3 class="text-2xl font-bold text-yellow-400 mb-2">ADMINISTRADOR</h3>
-                <p class="text-gray-300 text-sm mb-4">Crea la sala y controla el juego</p>
-                <ul class="text-left text-sm text-gray-400 space-y-2">
-                    <li>✓ Crea y gestiona la sala</li>
-                    <li>✓ Ve las respuestas de ambos jugadores</li>
-                    <li>✓ Controla cuándo pasar a la siguiente pregunta</li>
-                    <li>✓ Escucha todos los sonidos del juego</li>
-                </ul>
-            </div>
+  <!-- Pantalla de selección de ROL -->
+  <div id="pantallaRol" class="text-center w-full max-w-4xl">
+    <h1 class="text-3xl md:text-4xl font-bold mb-8 text-yellow-400">
+      TRIVIA BÍBLICA MULTIJUGADOR
+    </h1>
+    <p class="text-gray-400 mb-8">Selecciona tu rol para comenzar</p>
 
-            <div class="rol-card jugador" id="btnRolJugador">
-                <div class="text-6xl mb-4">🎮</div>
-                <h3 class="text-2xl font-bold text-blue-400 mb-2">JUGADOR</h3>
-                <p class="text-gray-300 text-sm mb-4">Únete a una sala existente</p>
-                <ul class="text-left text-sm text-gray-400 space-y-2">
-                    <li>✓ Ingresa el código de la sala</li>
-                    <li>✓ Compite en tiempo real</li>
-                    <li>✓ Responde las preguntas</li>
-                    <li>✓ Ve los resultados finales</li>
-                </ul>
-            </div>
-        </div>
+    <div class="rol-selector">
+      <div class="rol-card admin" id="btnRolAdmin">
+        <div class="text-6xl mb-4">👑</div>
+        <h3 class="text-2xl font-bold text-yellow-400 mb-2">ADMINISTRADOR</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Crea la sala y controla el juego
+        </p>
+        <ul class="text-left text-sm text-gray-400 space-y-2">
+          <li>Crea y gestiona la sala</li>
+          <li>Ve las respuestas de ambos jugadores</li>
+          <li>Controla cuándo pasar a la siguiente pregunta</li>
+          <li>Escucha todos los sonidos del juego</li>
+        </ul>
+      </div>
+
+      <div class="rol-card jugador" id="btnRolJugador">
+        <div class="text-6xl mb-4">🎮</div>
+        <h3 class="text-2xl font-bold text-blue-400 mb-2">JUGADOR</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Únete a una sala existente
+        </p>
+        <ul class="text-left text-sm text-gray-400 space-y-2">
+          <li>Ingresa el código de la sala</li>
+          <li>Compite en tiempo real</li>
+          <li>Responde las preguntas</li>
+          <li>Ve los resultados finales</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pantalla de selección de categoría SOLO ADMIN -->
+  <div id="categoriaSeleccion" class="hidden text-center w-full max-w-5xl">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-yellow-400">
+      TRIVIA BÍBLICA
+      <span class="admin-badge">ADMIN</span>
+    </h1>
+    <p class="text-gray-400 mb-8">Selecciona la categoría del juego</p>
+
+    <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8 categoriaSeleccion">
+      <div
+        class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-blue-900 to-gray-900 cursor-pointer"
+        data-categoria="Fácil"
+      >
+        <img
+          src="assets/sanson.png"
+          alt="Sansón"
+          class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img"
+        />
+        <h3 class="text-xl font-bold text-blue-300 mt-3">SANSÓN</h3>
+        <p class="text-gray-300 text-sm">Nivel Fácil - 10 pts</p>
+      </div>
+
+      <div
+        class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-purple-900 to-gray-900 cursor-pointer"
+        data-categoria="Medio"
+      >
+        <img
+          src="assets/david.png"
+          alt="David"
+          class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img"
+        />
+        <h3 class="text-xl font-bold text-purple-300 mt-3">DAVID</h3>
+        <p class="text-gray-300 text-sm">Nivel Medio - 20 pts</p>
+      </div>
+
+      <div
+        class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-red-900 to-gray-900 cursor-pointer"
+        data-categoria="Difícil"
+      >
+        <img
+          src="assets/elias.png"
+          alt="Elías"
+          class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img"
+        />
+        <h3 class="text-xl font-bold text-red-300 mt-3">ELÍAS</h3>
+        <p class="text-gray-300 text-sm">Nivel Difícil - 50 pts</p>
+      </div>
     </div>
 
-    <!-- Pantalla de selección de categoría (SOLO ADMIN) -->
-    <div id="categoriaSeleccion" class="hidden text-center w-full max-w-5xl">
-        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-yellow-400">
-            TRIVIA BÍBLICA 
-            <span class="admin-badge">ADMIN</span>
-        </h1>
-        <p class="text-gray-400 mb-8">Selecciona la categoría del juego</p>
-        
-        <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
-            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-blue-900 to-gray-900 cursor-pointer" data-categoria="Fácil">
-                <img src="assets/sanson.png" alt="Sansón" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
-                <h3 class="text-xl font-bold text-blue-300 mt-3">SANSÓN</h3>
-                <p class="text-gray-300 text-sm">Nivel Fácil - 10 pts</p>
-            </div>
-            
-            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-purple-900 to-gray-900 cursor-pointer" data-categoria="Medio">
-                <img src="assets/david.png" alt="David" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
-                <h3 class="text-xl font-bold text-purple-300 mt-3">DAVID</h3>
-                <p class="text-gray-300 text-sm">Nivel Medio - 20 pts</p>
-            </div>
-            
-            <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-red-900 to-gray-900 cursor-pointer" data-categoria="Difícil">
-                <img src="assets/elias.png" alt="Elías" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
-                <h3 class="text-xl font-bold text-red-300 mt-3">ELÍAS</h3>
-                <p class="text-gray-300 text-sm">Nivel Difícil - 50 pts</p>
-            </div>
+    <button
+      id="btnCrearSala"
+      class="hidden mt-8 px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg text-xl font-bold shadow-lg"
+    >
+      CREAR SALA
+    </button>
+  </div>
+
+  <!-- Pantalla para unirse como JUGADOR -->
+  <div id="pantallaUnirse" class="hidden text-center w-full max-w-2xl">
+    <h1 class="text-3xl md:text-4xl font-bold mb-8 text-blue-400">
+      UNIRSE A JUEGO
+    </h1>
+    <div class="bg-gray-900 p-8 rounded-2xl">
+      <p class="text-gray-400 mb-6">
+        Ingresa tus datos para unirte a la sala
+      </p>
+
+      <!-- Campo de nombre -->
+      <div class="mb-6">
+        <label class="block text-left text-sm text-gray-400 mb-2">
+          Tu nombre
+        </label>
+        <input
+          type="text"
+          id="inputNombreJugador"
+          class="w-full px-6 py-4 text-center text-xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg"
+          placeholder="Ej: Juan Pérez"
+          maxlength="20"
+        />
+      </div>
+
+      <!-- Campo de código de sala -->
+      <div class="mb-6">
+        <label class="block text-left text-sm text-gray-400 mb-2">
+          Código de Sala
+        </label>
+        <input
+          type="text"
+          id="inputCodigoSala"
+          class="w-full px-6 py-4 text-center text-3xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg uppercase tracking-widest"
+          placeholder="ABC123"
+          maxlength="6"
+        />
+      </div>
+
+      <button
+        id="btnUnirse"
+        class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition mb-4"
+      >
+        UNIRSE A LA SALA
+      </button>
+
+      <button
+        id="btnVolverRol"
+        class="mt-6 px-6 py-3 bg-gray-700 rounded-lg font-bold hover:bg-gray-600 transition"
+      >
+        Volver
+      </button>
+    </div>
+  </div>
+
+  <!-- Pantalla de Lobby / Sala de Espera -->
+  <div id="pantallaLobby" class="hidden w-full max-w-3xl text-center">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-yellow-400">
+      SALA DE ESPERA
+      <span id="adminBadgeLobby" class="admin-badge hidden">ADMIN</span>
+    </h1>
+
+    <div class="bg-gray-900 p-8 rounded-2xl mb-8">
+      <p class="text-gray-400 mb-4">Código de Sala</p>
+      <div class="codigo-sala text-blue-400 mb-6" id="codigoSala">
+        ------
+      </div>
+      <p class="text-sm text-gray-500">
+        Comparte este código con los jugadores
+      </p>
+
+      <div class="grid grid-cols-2 gap-6 mb-8">
+        <div class="bg-blue-900 p-6 rounded-xl" id="cardJugador1">
+          <div class="text-6xl mb-4">🎮</div>
+          <p class="text-xl font-bold text-blue-300">Jugador 1</p>
+          <p class="text-sm text-gray-400" id="nombreJ1">Esperando...</p>
         </div>
-        
-        <button id="btnCrearSala" class="hidden mt-8 px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg text-xl font-bold shadow-lg">
-            👑 CREAR SALA
-        </button>
+
+        <div class="bg-red-900 p-6 rounded-xl" id="cardJugador2">
+          <div class="text-6xl mb-4">🎮</div>
+          <p class="text-xl font-bold text-red-300">Jugador 2</p>
+          <p class="text-sm text-gray-400" id="nombreJ2">Esperando...</p>
+        </div>
+      </div>
+
+      <div id="loaderEspera" class="flex justify-center mb-6">
+        <div class="loader"></div>
+      </div>
+      <p class="text-gray-400 mb-8" id="textoEspera">
+        Esperando que se unan los jugadores...
+      </p>
+
+      <button
+        id="btnIniciarJuego"
+        class="hidden px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition mb-4"
+      >
+        INICIAR JUEGO
+      </button>
+
+      <button
+        id="btnCancelarSala"
+        class="px-6 py-3 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition"
+      >
+        Cancelar y Volver
+      </button>
+    </div>
+  </div>
+
+  <!-- Pantalla de juego -->
+  <div id="pantallaJuego" class="hidden w-full max-w-4xl text-center relative">
+    <div
+      class="absolute top-4 right-4 bg-gray-800 px-3 py-1 rounded-lg"
+    >
+      <span id="contadorPreguntas">Pregunta 1/15</span>
     </div>
 
-    <!-- Pantalla para unirse como JUGADOR -->
-    <div id="pantallaUnirse" class="hidden text-center w-full max-w-2xl">
-        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-blue-400">UNIRSE AL JUEGO</h1>
-        
-        <div class="bg-gray-900 p-8 rounded-2xl">
-            <p class="text-gray-400 mb-6">Ingresa tus datos para unirte a la sala</p>
-            
-            <!-- Campo de nombre -->
-            <div class="mb-6">
-                <label class="block text-left text-sm text-gray-400 mb-2">Tu nombre:</label>
-                <input type="text" id="inputNombreJugador" 
-                       class="w-full px-6 py-4 text-center text-xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg"
-                       placeholder="Ej: Juan Pérez"
-                       maxlength="20">
-            </div>
-
-            <!-- Campo de código de sala -->
-            <div class="mb-6">
-                <label class="block text-left text-sm text-gray-400 mb-2">Código de sala:</label>
-                <input type="text" id="inputCodigoSala" 
-                       class="w-full px-6 py-4 text-center text-3xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg uppercase tracking-widest"
-                       placeholder="ABC123"
-                       maxlength="6">
-            </div>
-            
-            <button id="btnUnirse" class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition mb-4">
-                🎮 UNIRSE A LA SALA
-            </button>
-        </div>
-
-        <button id="btnVolverRol" class="mt-6 px-6 py-3 bg-gray-700 rounded-lg font-bold hover:bg-gray-600 transition">
-            ← Volver
-        </button>
+    <!-- Badge de Admin en juego -->
+    <div
+      id="adminBadgeJuego"
+      class="hidden absolute top-4 left-12 transform -translate-x-12"
+    >
+      <span class="admin-badge">MODO ADMINISTRADOR</span>
     </div>
 
-    <!-- Pantalla de Lobby/Sala de Espera -->
-    <div id="pantallaLobby" class="hidden w-full max-w-3xl text-center">
-        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-yellow-400">
-            SALA DE ESPERA
-            <span id="adminBadgeLobby" class="admin-badge hidden">ADMIN</span>
-        </h1>
-        
-        <div class="bg-gray-900 p-8 rounded-2xl mb-8">
-            <p class="text-gray-400 mb-4">Código de Sala</p>
-            <div class="codigo-sala text-blue-400 mb-6" id="codigoSala">------</div>
-            <p class="text-sm text-gray-500">Comparte este código con los jugadores</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6 mb-8">
-            <div class="bg-blue-900 p-6 rounded-xl" id="cardJugador1">
-                <div class="text-6xl mb-4">❓</div>
-                <p class="text-xl font-bold text-blue-300">Jugador 1</p>
-                <p class="text-sm text-gray-400" id="nombreJ1">Esperando...</p>
-            </div>
-
-            <div class="bg-red-900 p-6 rounded-xl" id="cardJugador2">
-                <div class="text-6xl mb-4">❓</div>
-                <p class="text-xl font-bold text-red-300">Jugador 2</p>
-                <p class="text-sm text-gray-400" id="nombreJ2">Esperando...</p>
-            </div>
-        </div>
-
-        <div id="loaderEspera" class="flex justify-center mb-6">
-            <div class="loader"></div>
-        </div>
-
-        <p class="text-gray-400 mb-8" id="textoEspera">Esperando que se unan los jugadores...</p>
-
-        <button id="btnIniciarJuego" class="hidden px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition mb-4">
-            🚀 INICIAR JUEGO
-        </button>
-
-        <button id="btnCancelarSala" class="px-6 py-3 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition">
-            Cancelar y Volver
-        </button>
+    <!-- Cronómetro circular -->
+    <div class="cronometro-container mb-6 mt-16">
+      <svg class="cronometro-circle" width="120" height="120">
+        <circle class="cronometro-bg" cx="60" cy="60" r="50"></circle>
+        <circle
+          class="cronometro-progress"
+          cx="60"
+          cy="60"
+          r="50"
+          stroke-dasharray="314"
+          stroke-dashoffset="0"
+          id="cronometroCircle"
+        ></circle>
+      </svg>
+      <div class="cronometro-text" id="cronometroTexto">10</div>
     </div>
 
-    <!-- Pantalla de juego -->
-    <div id="pantallaJuego" class="hidden w-full max-w-4xl text-center relative">
-        <div class="absolute top-4 right-4 bg-gray-800 px-3 py-1 rounded-lg">
-            <span id="contadorPreguntas">Pregunta 1/15</span>
-        </div>
-
-        <!-- Badge de Admin en juego -->
-        <div id="adminBadgeJuego" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2">
-            <span class="admin-badge">MODO ADMINISTRADOR</span>
-        </div>
-
-        <!-- Cronómetro circular -->
-        <div class="cronometro-container mb-6 mt-16">
-            <svg class="cronometro-circle" width="120" height="120">
-                <circle class="cronometro-bg" cx="60" cy="60" r="50"></circle>
-                <circle class="cronometro-progress" cx="60" cy="60" r="50" 
-                        stroke-dasharray="314" stroke-dashoffset="0" id="cronometroCircle"></circle>
-            </svg>
-            <div class="cronometro-text" id="cronometroTexto">10</div>
-        </div>
-
-        <!-- Marcadores de puntuación con nombres -->
-        <div class="flex justify-center gap-4 mb-6">
-            <div class="bg-blue-900 px-6 py-3 rounded-lg">
-                <p class="text-xs text-blue-300" id="labelJ1">Jugador 1</p>
-                <p class="text-3xl font-bold" id="puntosJ1">0</p>
-            </div>
-            <div class="bg-red-900 px-6 py-3 rounded-lg">
-                <p class="text-xs text-red-300" id="labelJ2">Jugador 2</p>
-                <p class="text-3xl font-bold" id="puntosJ2">0</p>
-            </div>
-        </div>
-        
-        <div class="mb-8 px-4">
-            <h2 id="preguntaTexto" class="text-2xl md:text-3xl font-bold mb-2"></h2>
-        </div>
-        
-        <div id="contenedorRespuestas" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-20 px-4">
-            <!-- Respuestas se generan aquí -->
-        </div>
-        
-        <!-- Botones de control (SOLO ADMIN) -->
-        <div id="controlesAdmin" class="hidden fixed bottom-4 left-0 right-0 px-6 flex justify-center gap-4">
-            <button id="btnSiguientePregunta" class="hidden px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition">
-                ➡️ SIGUIENTE PREGUNTA
-            </button>
-        </div>
-
-        <div class="fixed bottom-4 left-4">
-            <button id="btnSalirJuego" class="px-4 py-2 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition">
-                Salir
-            </button>
-        </div>
+    <!-- Marcadores de puntuación con nombres -->
+    <div class="flex justify-center gap-4 mb-6">
+      <div class="bg-blue-900 px-6 py-3 rounded-lg">
+        <p class="text-xs text-blue-300" id="labelJ1">Jugador 1</p>
+        <p class="text-3xl font-bold" id="puntosJ1">0</p>
+      </div>
+      <div class="bg-red-900 px-6 py-3 rounded-lg">
+        <p class="text-xs text-red-300" id="labelJ2">Jugador 2</p>
+        <p class="text-3xl font-bold" id="puntosJ2">0</p>
+      </div>
     </div>
 
-    <!-- Pantalla de resumen final -->
-    <div id="pantallaResumen" class="hidden w-full max-w-4xl text-center">
-        <div class="trofeo-ganador mb-6">🏆</div>
-        <h1 class="text-4xl md:text-5xl font-bold mb-8 text-yellow-400" id="tituloGanador">¡JUGADOR 1 GANA!</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div id="cardResumenJ1" class="puntuacion-card bg-gradient-to-br from-blue-900 to-gray-900 p-8 rounded-2xl">
-                <div class="text-6xl mb-4">👤</div>
-                <h2 class="text-2xl font-bold text-blue-300 mb-4" id="nombreResumenJ1">Jugador 1</h2>
-                <div class="space-y-3">
-                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Puntos totales</p>
-                        <p class="text-4xl font-bold text-yellow-400" id="puntajeFinalJ1">0</p>
-                    </div>
-                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Respuestas correctas</p>
-                        <p class="text-4xl font-bold text-green-400" id="correctasJ1">0</p>
-                    </div>
-                    <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Precisión</p>
-                        <p class="text-3xl font-bold text-purple-400" id="precisionJ1">0%</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="cardResumenJ2" class="puntuacion-card bg-gradient-to-br from-red-900 to-gray-900 p-8 rounded-2xl">
-                <div class="text-6xl mb-4">👤</div>
-                <h2 class="text-2xl font-bold text-red-300 mb-4" id="nombreResumenJ2">Jugador 2</h2>
-                <div class="space-y-3">
-                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Puntos totales</p>
-                        <p class="text-4xl font-bold text-yellow-400" id="puntajeFinalJ2">0</p>
-                    </div>
-                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Respuestas correctas</p>
-                        <p class="text-4xl font-bold text-green-400" id="correctasJ2">0</p>
-                    </div>
-                    <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
-                        <p class="text-sm text-gray-300">Precisión</p>
-                        <p class="text-3xl font-bold text-purple-400" id="precisionJ2">0%</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex justify-center gap-6">
-            <button id="btnVolverInicio" class="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition-transform">
-                🏠 Volver al Inicio
-            </button>
-        </div>
+    <div class="mb-8 px-4">
+      <h2
+        id="preguntaTexto"
+        class="text-2xl md:text-3xl font-bold mb-2"
+      ></h2>
     </div>
 
-    <script src="config.js"></script>
-    <script src="preguntas.js"></script>
-    
-    <script>
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        
-        // Sistema de audio
-        const audioSystem = {
-            sounds: {
-                tick: new Audio('assets/sounds/tic-tac.mp3'),
-                timeout: new Audio('assets/sounds/timeout.mp3'),
-                correct: new Audio('assets/sounds/correct.mp3'),
-                wrong: new Audio('assets/sounds/wrong.mp3')
-            },
-            enabled: false,
-            
-            init() {
-                document.addEventListener('click', () => {
-                    this.enabled = true;
-                }, { once: true });
-            },
-            
-            play(soundName) {
-                if (this.enabled && this.sounds[soundName]) {
-                    this.sounds[soundName].currentTime = 0;
-                    this.sounds[soundName].play().catch(e => console.log('Audio play failed:', e));
-                }
-            },
-            
-            loop(soundName) {
-                if (this.enabled && this.sounds[soundName]) {
-                    this.sounds[soundName].loop = true;
-                    this.sounds[soundName].play().catch(e => console.log('Audio loop failed:', e));
-                }
-            },
-            
-            stop(soundName) {
-                if (this.sounds[soundName]) {
-                    this.sounds[soundName].pause();
-                    this.sounds[soundName].currentTime = 0;
-                    this.sounds[soundName].loop = false;
-                }
-            }
-        };
+    <div
+      id="contenedorRespuestas"
+      class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-20 px-4"
+    >
+      <!-- Respuestas se generan aquí -->
+    </div>
 
-        // Estado global
-        const gameState = {
-            rol: null,
-            jugadorNumero: null,
-            nombreJugador: null,
-            nombresJugadores: { jugador1: 'Jugador 1', jugador2: 'Jugador 2' },
-            categoriaSeleccionada: null,
-            salaId: null,
-            channel: null,
-            preguntasFiltradas: [],
-            preguntaIndex: 0,
-            tiempoRestante: 10,
-            timerInterval: null,
-            puntajes: { jugador1: 0, jugador2: 0 },
-            respuestas: { jugador1: null, jugador2: null },
-            respuestasCorrectas: { jugador1: 0, jugador2: 0 },
-            jugadoresConectados: { jugador1: false, jugador2: false },
-            MAX_PREGUNTAS: 15,
-            TIEMPO_POR_PREGUNTA: 10,
-            PUNTOS_POR_NIVEL: { 'Fácil': 10, 'Medio': 20, 'Difícil': 50 }
-        };
+    <!-- Botones de control SOLO ADMIN -->
+    <div
+      id="controlesAdmin"
+      class="hidden fixed bottom-4 left-0 right-0 px-6 flex justify-center gap-4"
+    >
+      <button
+        id="btnSiguientePregunta"
+        class="hidden px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition"
+      >
+        SIGUIENTE PREGUNTA
+      </button>
+    </div>
 
-        // Elementos DOM
-        const DOM = {
-            pantallaRol: document.getElementById('pantallaRol'),
-            pantallaCategoria: document.getElementById('categoriaSeleccion'),
-            pantallaUnirse: document.getElementById('pantallaUnirse'),
-            pantallaLobby: document.getElementById('pantallaLobby'),
-            pantallaJuego: document.getElementById('pantallaJuego'),
-            pantallaResumen: document.getElementById('pantallaResumen'),
-            btnRolAdmin: document.getElementById('btnRolAdmin'),
-            btnRolJugador: document.getElementById('btnRolJugador'),
-            categorias: document.querySelectorAll('.categoria-card'),
-            btnCrearSala: document.getElementById('btnCrearSala'),
-            inputNombreJugador: document.getElementById('inputNombreJugador'),
-            inputCodigoSala: document.getElementById('inputCodigoSala'),
-            btnUnirse: document.getElementById('btnUnirse'),
-            btnVolverRol: document.getElementById('btnVolverRol'),
-            codigoSala: document.getElementById('codigoSala'),
-            btnIniciarJuego: document.getElementById('btnIniciarJuego'),
-            btnCancelarSala: document.getElementById('btnCancelarSala'),
-            preguntaTexto: document.getElementById('preguntaTexto'),
-            contenedorRespuestas: document.getElementById('contenedorRespuestas'),
-            contadorPreguntas: document.getElementById('contadorPreguntas'),
-            cronometroTexto: document.getElementById('cronometroTexto'),
-            cronometroCircle: document.getElementById('cronometroCircle'),
-            puntosJ1: document.getElementById('puntosJ1'),
-            puntosJ2: document.getElementById('puntosJ2'),
-            labelJ1: document.getElementById('labelJ1'),
-            labelJ2: document.getElementById('labelJ2'),
-            btnSiguientePregunta: document.getElementById('btnSiguientePregunta'),
-            btnSalirJuego: document.getElementById('btnSalirJuego'),
-            btnVolverInicio: document.getElementById('btnVolverInicio'),
-            controlesAdmin: document.getElementById('controlesAdmin'),
-            adminBadgeJuego: document.getElementById('adminBadgeJuego'),
-            adminBadgeLobby: document.getElementById('adminBadgeLobby'),
-            nombreResumenJ1: document.getElementById('nombreResumenJ1'),
-            nombreResumenJ2: document.getElementById('nombreResumenJ2')
-        };
+    <div class="fixed bottom-4 left-4">
+      <button
+        id="btnSalirJuego"
+        class="px-4 py-2 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition"
+      >
+        Salir
+      </button>
+    </div>
+  </div>
 
-        // ===== FUNCIONES DE NAVEGACIÓN =====
-        
-        function mostrarPantalla(pantalla) {
-            [DOM.pantallaRol, DOM.pantallaCategoria, DOM.pantallaUnirse, 
-             DOM.pantallaLobby, DOM.pantallaJuego, DOM.pantallaResumen].forEach(p => {
-                p.classList.add('hidden');
-            });
-            pantalla.classList.remove('hidden');
+  <!-- Pantalla de resumen final -->
+  <div id="pantallaResumen" class="hidden w-full max-w-4xl text-center">
+    <div class="trofeo-ganador mb-6">🏆</div>
+    <h1
+      class="text-4xl md:text-5xl font-bold mb-8 text-yellow-400"
+      id="tituloGanador"
+    >
+      JUGADOR 1 GANA!
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <div
+        id="cardResumenJ1"
+        class="puntuacion-card bg-gradient-to-br from-blue-900 to-gray-900 p-8 rounded-2xl"
+      >
+        <div class="text-6xl mb-4">🎮</div>
+        <h2
+          class="text-2xl font-bold text-blue-300 mb-4"
+          id="nombreResumenJ1"
+        >
+          Jugador 1
+        </h2>
+        <div class="space-y-3">
+          <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-300">Puntos totales</p>
+            <p
+              class="text-4xl font-bold text-yellow-400"
+              id="puntajeFinalJ1"
+            >
+              0
+            </p>
+          </div>
+          <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-300">Respuestas correctas</p>
+            <p
+              class="text-4xl font-bold text-green-400"
+              id="correctasJ1"
+            >
+              0
+            </p>
+          </div>
+          <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-300">Precisión</p>
+            <p
+              class="text-3xl font-bold text-purple-400"
+              id="precisionJ1"
+            >
+              0%
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="cardResumenJ2"
+        class="puntuacion-card bg-gradient-to-br from-red-900 to-gray-900 p-8 rounded-2xl"
+      >
+        <div class="text-6xl mb-4">🎮</div>
+        <h2
+          class="text-2xl font-bold text-red-300 mb-4"
+          id="nombreResumenJ2"
+        >
+          Jugador 2
+        </h2>
+        <div class="space-y-3">
+          <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-300">Puntos totales</p>
+            <p
+              class="text-4xl font-bold text-yellow-400"
+              id="puntajeFinalJ2"
+            >
+              0
+            </p>
+          </div>
+          <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-300">Respuestas correctas</p>
+            <p
+              class="text-4xl font-bold text-green-400"
+              id="correctasJ2"
+            >
+              0
+            </p>
+          </div>
+          <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-300">Precisión</p>
+            <p
+              class="text-3xl font-bold text-purple-400"
+              id="precisionJ2"
+            >
+              0%
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-center gap-6">
+      <button
+        id="btnVolverInicio"
+        class="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition-transform"
+      >
+        Volver al Inicio
+      </button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="preguntas.js"></script>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+    // Sistema de audio
+    const audioSystem = {
+      sounds: {
+        tick: new Audio('assets/sounds/tic-tac.mp3'),
+        timeout: new Audio('assets/sounds/timeout.mp3'),
+        correct: new Audio('assets/sounds/correct.mp3'),
+        wrong: new Audio('assets/sounds/wrong.mp3')
+      },
+      enabled: false,
+      init() {
+        document.addEventListener(
+          'click',
+          () => {
+            this.enabled = true;
+          },
+          { once: true }
+        );
+      },
+      play(soundName) {
+        if (this.enabled && this.sounds[soundName]) {
+          this.sounds[soundName].currentTime = 0;
+          this.sounds[soundName].play().catch((e) => console.log('Audio play failed', e));
         }
-
-        // ===== EVENTOS DE ROL =====
-        
-        DOM.btnRolAdmin.addEventListener('click', () => {
-            gameState.rol = 'admin';
-            mostrarPantalla(DOM.pantallaCategoria);
-        });
-
-        DOM.btnRolJugador.addEventListener('click', () => {
-            gameState.rol = 'jugador';
-            mostrarPantalla(DOM.pantallaUnirse);
-        });
-
-        DOM.btnVolverRol.addEventListener('click', () => {
-            mostrarPantalla(DOM.pantallaRol);
-        });
-
-        // ===== SELECCIÓN DE CATEGORÍA (ADMIN) =====
-        
-        DOM.categorias.forEach(categoria => {
-            categoria.addEventListener('click', (e) => {
-                e.stopPropagation();
-                DOM.categorias.forEach(c => c.classList.remove('selected'));
-                categoria.classList.add('selected');
-                gameState.categoriaSeleccionada = categoria.dataset.categoria;
-                DOM.btnCrearSala.classList.remove('hidden');
-            });
-        });
-
-        DOM.btnCrearSala.addEventListener('click', crearSala);
-
-        // ===== UNIRSE COMO JUGADOR =====
-        
-        DOM.inputCodigoSala.addEventListener('input', (e) => {
-            e.target.value = e.target.value.toUpperCase();
-        });
-
-        DOM.btnUnirse.addEventListener('click', () => {
-            const nombre = DOM.inputNombreJugador.value.trim();
-            const codigo = DOM.inputCodigoSala.value.trim();
-            
-            if (!nombre) {
-                alert('Por favor ingresa tu nombre');
-                return;
-            }
-            
-            if (codigo.length !== 6) {
-                alert('Por favor ingresa un código válido de 6 caracteres');
-                return;
-            }
-            
-            gameState.nombreJugador = nombre;
-            unirseASala(codigo);
-        });
-
-        // ===== FUNCIONES DE SUPABASE =====
-        
-        function generarCodigoSala() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
+      },
+      loop(soundName) {
+        if (this.enabled && this.sounds[soundName]) {
+          this.sounds[soundName].loop = true;
+          this.sounds[soundName].play().catch((e) => console.log('Audio loop failed', e));
         }
+      },
+      stop(soundName) {
+        if (this.sounds[soundName]) {
+          this.sounds[soundName].pause();
+          this.sounds[soundName].currentTime = 0;
+          this.sounds[soundName].loop = false;
+        }
+      }
+    };
 
-        async function crearSala() {
-            const codigo = generarCodigoSala();
-            gameState.salaId = codigo;
-            
-            gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
-                config: { broadcast: { self: true } }
+    // Estado global (con socketId agregado)
+    const gameState = {
+      rol: null,
+      jugadorNumero: null,
+      nombreJugador: null,
+      socketId: null, // NUEVO
+      nombresJugadores: {
+        jugador1: 'Jugador 1',
+        jugador2: 'Jugador 2'
+      },
+      categoriaSeleccionada: null,
+      salaId: null,
+      channel: null,
+      preguntasFiltradas: [],
+      preguntaIndex: 0,
+      tiempoRestante: 10,
+      timerInterval: null,
+      puntajes: {
+        jugador1: 0,
+        jugador2: 0
+      },
+      respuestas: {
+        jugador1: null,
+        jugador2: null
+      },
+      respuestasCorrectas: {
+        jugador1: 0,
+        jugador2: 0
+      },
+      jugadoresConectados: {
+        jugador1: false,
+        jugador2: false
+      },
+      MAXPREGUNTAS: 15,
+      TIEMPO_POR_PREGUNTA: 10,
+      PUNTOS_POR_NIVEL: {
+        'Fácil': 10,
+        'Medio': 20,
+        'Difícil': 50
+      }
+    };
+
+    // Elementos DOM
+    const DOM = {
+      pantallaRol: document.getElementById('pantallaRol'),
+      pantallaCategoria: document.getElementById('categoriaSeleccion'),
+      pantallaUnirse: document.getElementById('pantallaUnirse'),
+      pantallaLobby: document.getElementById('pantallaLobby'),
+      pantallaJuego: document.getElementById('pantallaJuego'),
+      pantallaResumen: document.getElementById('pantallaResumen'),
+
+      btnRolAdmin: document.getElementById('btnRolAdmin'),
+      btnRolJugador: document.getElementById('btnRolJugador'),
+
+      categorias: document.querySelectorAll('.categoria-card'),
+      btnCrearSala: document.getElementById('btnCrearSala'),
+
+      inputNombreJugador: document.getElementById('inputNombreJugador'),
+      inputCodigoSala: document.getElementById('inputCodigoSala'),
+      btnUnirse: document.getElementById('btnUnirse'),
+      btnVolverRol: document.getElementById('btnVolverRol'),
+
+      codigoSala: document.getElementById('codigoSala'),
+      btnIniciarJuego: document.getElementById('btnIniciarJuego'),
+      btnCancelarSala: document.getElementById('btnCancelarSala'),
+
+      preguntaTexto: document.getElementById('preguntaTexto'),
+      contenedorRespuestas: document.getElementById('contenedorRespuestas'),
+      contadorPreguntas: document.getElementById('contadorPreguntas'),
+      cronometroTexto: document.getElementById('cronometroTexto'),
+      cronometroCircle: document.getElementById('cronometroCircle'),
+
+      puntosJ1: document.getElementById('puntosJ1'),
+      puntosJ2: document.getElementById('puntosJ2'),
+      labelJ1: document.getElementById('labelJ1'),
+      labelJ2: document.getElementById('labelJ2'),
+
+      btnSiguientePregunta: document.getElementById('btnSiguientePregunta'),
+      btnSalirJuego: document.getElementById('btnSalirJuego'),
+      btnVolverInicio: document.getElementById('btnVolverInicio'),
+
+      controlesAdmin: document.getElementById('controlesAdmin'),
+      adminBadgeJuego: document.getElementById('adminBadgeJuego'),
+      adminBadgeLobby: document.getElementById('adminBadgeLobby'),
+
+      nombreResumenJ1: document.getElementById('nombreResumenJ1'),
+      nombreResumenJ2: document.getElementById('nombreResumenJ2')
+    };
+
+    // Navegación de pantallas
+    function mostrarPantalla(pantalla) {
+      [
+        DOM.pantallaRol,
+        DOM.pantallaCategoria,
+        DOM.pantallaUnirse,
+        DOM.pantallaLobby,
+        DOM.pantallaJuego,
+        DOM.pantallaResumen
+      ].forEach((p) => p.classList.add('hidden'));
+      pantalla.classList.remove('hidden');
+    }
+
+    // Eventos de rol
+    DOM.btnRolAdmin.addEventListener('click', () => {
+      gameState.rol = 'admin';
+      mostrarPantalla(DOM.pantallaCategoria);
+    });
+
+    DOM.btnRolJugador.addEventListener('click', () => {
+      gameState.rol = 'jugador';
+      mostrarPantalla(DOM.pantallaUnirse);
+    });
+
+    DOM.btnVolverRol.addEventListener('click', () => {
+      mostrarPantalla(DOM.pantallaRol);
+    });
+
+    // Selección de categoría ADMIN
+    DOM.categorias.forEach((categoria) => {
+      categoria.addEventListener('click', (e) => {
+        e.stopPropagation();
+        DOM.categorias.forEach((c) => c.classList.remove('selected'));
+        categoria.classList.add('selected');
+        gameState.categoriaSeleccionada = categoria.dataset.categoria;
+        DOM.btnCrearSala.classList.remove('hidden');
+      });
+    });
+
+    DOM.btnCrearSala.addEventListener('click', crearSala);
+
+    // Unirse como jugador
+    DOM.inputCodigoSala.addEventListener('input', (e) => {
+      e.target.value = e.target.value.toUpperCase();
+    });
+
+    DOM.btnUnirse.addEventListener('click', () => {
+      const nombre = DOM.inputNombreJugador.value.trim();
+      const codigo = DOM.inputCodigoSala.value.trim();
+
+      if (!nombre) {
+        alert('Por favor ingresa tu nombre');
+        return;
+      }
+
+      if (codigo.length !== 6) {
+        alert('Por favor ingresa un código válido de 6 caracteres');
+        return;
+      }
+
+      gameState.nombreJugador = nombre;
+      unirseASala(codigo);
+    });
+
+    // Funciones Supabase
+    function generarCodigoSala() {
+      return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+
+    async function crearSala() {
+      const codigo = generarCodigoSala();
+      gameState.salaId = codigo;
+
+      gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
+        config: { broadcast: { self: true } }
+      });
+
+      gameState.channel
+        // Jugador conectado (desde jugadores)
+        .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
+          const { nombre, socketId } = payload;
+
+          // Asignar primer jugador libre: 1 luego 2
+          let numJugador = null;
+          if (!gameState.jugadoresConectados.jugador1) {
+            numJugador = 1;
+          } else if (!gameState.jugadoresConectados.jugador2) {
+            numJugador = 2;
+          } else {
+            // ya hay 2 jugadores, ignorar conexiones extra
+            return;
+          }
+
+          gameState.jugadoresConectados[`jugador${numJugador}`] = true;
+          gameState.nombresJugadores[`jugador${numJugador}`] = nombre;
+
+          const card = document.getElementById(`cardJugador${numJugador}`);
+          card.classList.add('jugador-conectado');
+          card.querySelector('.text-6xl').textContent = '🎮';
+          document.getElementById(`nombreJ${numJugador}`).textContent = nombre;
+
+          if (gameState.jugadoresConectados.jugador1 && gameState.jugadoresConectados.jugador2) {
+            document.getElementById('loaderEspera').classList.add('hidden');
+            document.getElementById('textoEspera').textContent =
+              'Ambos jugadores conectados! El admin puede iniciar el juego.';
+            DOM.btnIniciarJuego.classList.remove('hidden');
+          }
+
+          // Responder al jugador con su número
+          gameState.channel.send({
+            type: 'broadcast',
+            event: 'asignar-numero-jugador',
+            payload: {
+              socketId,
+              jugadorNumero: numJugador,
+              nombres: gameState.nombresJugadores
+            }
+          });
+        })
+        .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
+          const { jugador, respuestaIndex } = payload;
+          gameState.respuestas[`jugador${jugador}`] = respuestaIndex;
+          actualizarEstilosRespuestas();
+        })
+        .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
+          gameState.categoriaSeleccionada = payload.categoria;
+          gameState.nombresJugadores = payload.nombres;
+          iniciarJuegoMultijugador();
+        })
+        .on('broadcast', { event: 'siguiente-pregunta' }, () => {
+          gameState.preguntaIndex++;
+          mostrarPregunta();
+        })
+        .on('broadcast', { event: 'fin-juego' }, () => {
+          finalizarJuego();
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            gameState.socketId = gameState.channel.socket?.id ?? null;
+          }
+        });
+
+      mostrarPantalla(DOM.pantallaLobby);
+      DOM.codigoSala.textContent = codigo;
+      DOM.adminBadgeLobby.classList.remove('hidden');
+    }
+
+    async function unirseASala(codigo) {
+      gameState.salaId = codigo;
+
+      gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
+        config: { broadcast: { self: true } }
+      });
+
+      gameState.channel
+        .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
+          if (payload.jugador !== gameState.jugadorNumero) {
+            gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
+            actualizarEstilosRespuestas();
+          }
+        })
+        .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
+          gameState.categoriaSeleccionada = payload.categoria;
+          gameState.nombresJugadores = payload.nombres;
+          iniciarJuegoMultijugador();
+        })
+        .on('broadcast', { event: 'siguiente-pregunta' }, () => {
+          gameState.preguntaIndex++;
+          mostrarPregunta();
+        })
+        .on('broadcast', { event: 'fin-juego' }, () => {
+          finalizarJuego();
+        })
+        .on('broadcast', { event: 'asignar-numero-jugador' }, ({ payload }) => {
+          if (!gameState.socketId || payload.socketId !== gameState.socketId) return;
+
+          gameState.jugadorNumero = payload.jugadorNumero;
+          gameState.nombresJugadores = payload.nombres;
+
+          if (gameState.jugadorNumero === 1) {
+            document.getElementById('nombreJ1').textContent = gameState.nombreJugador;
+          } else if (gameState.jugadorNumero === 2) {
+            document.getElementById('nombreJ2').textContent = gameState.nombreJugador;
+          }
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            gameState.socketId = gameState.channel.socket?.id ?? null;
+
+            gameState.channel.send({
+              type: 'broadcast',
+              event: 'jugador-conectado',
+              payload: {
+                nombre: gameState.nombreJugador,
+                socketId: gameState.socketId
+              }
             });
-
-            gameState.channel
-                .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
-                    const numJugador = payload.jugador;
-                    const nombre = payload.nombre;
-                    
-                    gameState.jugadoresConectados[`jugador${numJugador}`] = true;
-                    gameState.nombresJugadores[`jugador${numJugador}`] = nombre;
-                    
-                    document.getElementById(`cardJugador${numJugador}`).classList.add('jugador-conectado');
-                    document.getElementById(`cardJugador${numJugador}`).querySelector('.text-6xl').textContent = '✓';
-                    document.getElementById(`nombreJ${numJugador}`).textContent = nombre;
-                    
-                    if (gameState.jugadoresConectados.jugador1 && gameState.jugadoresConectados.jugador2) {
-                        document.getElementById('loaderEspera').classList.add('hidden');
-                        document.getElementById('textoEspera').textContent = '¡Ambos jugadores conectados! El admin puede iniciar el juego.';
-                        DOM.btnIniciarJuego.classList.remove('hidden');
-                    }
-                })
-                .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
-                    gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
-                    actualizarEstilosRespuestas();
-                })
-                .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
-                    gameState.categoriaSeleccionada = payload.categoria;
-                    gameState.nombresJugadores = payload.nombres;
-                    iniciarJuegoMultijugador();
-                })
-                .on('broadcast', { event: 'siguiente-pregunta' }, () => {
-                    gameState.preguntaIndex++;
-                    mostrarPregunta();
-                })
-                .on('broadcast', { event: 'fin-juego' }, () => {
-                    finalizarJuego();
-                })
-                .subscribe();
 
             mostrarPantalla(DOM.pantallaLobby);
             DOM.codigoSala.textContent = codigo;
-            DOM.adminBadgeLobby.classList.remove('hidden');
-        }
-
-        async function unirseASala(codigo) {
-            gameState.salaId = codigo;
-            
-            const numJugador = !gameState.jugadoresConectados.jugador1 ? 1 : 2;
-            gameState.jugadorNumero = numJugador;
-
-            gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
-                config: { broadcast: { self: true } }
-            });
-
-            gameState.channel
-                .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
-                    if (payload.jugador !== gameState.jugadorNumero) {
-                        gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
-                        actualizarEstilosRespuestas();
-                    }
-                })
-                .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
-                    gameState.categoriaSeleccionada = payload.categoria;
-                    gameState.nombresJugadores = payload.nombres;
-                    iniciarJuegoMultijugador();
-                })
-                .on('broadcast', { event: 'siguiente-pregunta' }, () => {
-                    gameState.preguntaIndex++;
-                    mostrarPregunta();
-                })
-                .on('broadcast', { event: 'fin-juego' }, () => {
-                    finalizarJuego();
-                })
-                .subscribe((status) => {
-                    if (status === 'SUBSCRIBED') {
-                        gameState.channel.send({
-                            type: 'broadcast',
-                            event: 'jugador-conectado',
-                            payload: { 
-                                jugador: numJugador,
-                                nombre: gameState.nombreJugador
-                            }
-                        });
-
-                        mostrarPantalla(DOM.pantallaLobby);
-                        DOM.codigoSala.textContent = codigo;
-                        document.getElementById('textoEspera').textContent = 'Esperando que el administrador inicie el juego...';
-                        document.getElementById('loaderEspera').classList.remove('hidden');
-                    }
-                });
-        }
-
-        // ===== INICIAR JUEGO (ADMIN) =====
-        
-        DOM.btnIniciarJuego.addEventListener('click', () => {
-            gameState.channel.send({
-                type: 'broadcast',
-                event: 'iniciar-juego',
-                payload: { 
-                    categoria: gameState.categoriaSeleccionada,
-                    nombres: gameState.nombresJugadores
-                }
-            });
+            document.getElementById('textoEspera').textContent =
+              'Esperando que el administrador inicie el juego...';
+            document.getElementById('loaderEspera').classList.remove('hidden');
+          }
         });
+    }
 
-        // ===== LÓGICA DEL JUEGO =====
-        
-        function iniciarJuegoMultijugador() {
-            gameState.preguntasFiltradas = preguntas.filter(p => p.category === gameState.categoriaSeleccionada);
-            
-            for (let i = gameState.preguntasFiltradas.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [gameState.preguntasFiltradas[i], gameState.preguntasFiltradas[j]] = 
-                    [gameState.preguntasFiltradas[j], gameState.preguntasFiltradas[i]];
-            }
+    // Iniciar juego ADMIN
+    DOM.btnIniciarJuego.addEventListener('click', () => {
+      gameState.channel.send({
+        type: 'broadcast',
+        event: 'iniciar-juego',
+        payload: {
+          categoria: gameState.categoriaSeleccionada,
+          nombres: gameState.nombresJugadores
+        }
+      });
+    });
 
-            gameState.preguntasFiltradas = gameState.preguntasFiltradas.slice(0, gameState.MAX_PREGUNTAS);
-            gameState.preguntaIndex = 0;
-            gameState.puntajes = { jugador1: 0, jugador2: 0 };
-            gameState.respuestasCorrectas = { jugador1: 0, jugador2: 0 };
-            
-            // Actualizar nombres en la pantalla de juego
-            DOM.labelJ1.textContent = gameState.nombresJugadores.jugador1;
-            DOM.labelJ2.textContent = gameState.nombresJugadores.jugador2;
-            
-            mostrarPantalla(DOM.pantallaJuego);
-            
-            if (gameState.rol === 'admin') {
-                DOM.controlesAdmin.classList.remove('hidden');
-                DOM.adminBadgeJuego.classList.remove('hidden');
-            }
-            
-            mostrarPregunta();
+    // Lógica del juego
+    function iniciarJuegoMultijugador() {
+      gameState.preguntasFiltradas = preguntas.filter(
+        (p) => p.category === gameState.categoriaSeleccionada
+      );
+
+      for (let i = gameState.preguntasFiltradas.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [gameState.preguntasFiltradas[i], gameState.preguntasFiltradas[j]] = [
+          gameState.preguntasFiltradas[j],
+          gameState.preguntasFiltradas[i]
+        ];
+      }
+
+      gameState.preguntasFiltradas = gameState.preguntasFiltradas.slice(
+        0,
+        gameState.MAXPREGUNTAS
+      );
+      gameState.preguntaIndex = 0;
+      gameState.puntajes.jugador1 = 0;
+      gameState.puntajes.jugador2 = 0;
+      gameState.respuestasCorrectas.jugador1 = 0;
+      gameState.respuestasCorrectas.jugador2 = 0;
+
+      DOM.labelJ1.textContent = gameState.nombresJugadores.jugador1;
+      DOM.labelJ2.textContent = gameState.nombresJugadores.jugador2;
+
+      mostrarPantalla(DOM.pantallaJuego);
+
+      if (gameState.rol === 'admin') {
+        DOM.controlesAdmin.classList.remove('hidden');
+        DOM.adminBadgeJuego.classList.remove('hidden');
+      }
+
+      mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+      if (gameState.preguntaIndex >= gameState.preguntasFiltradas.length) {
+        if (gameState.rol === 'admin') {
+          gameState.channel.send({
+            type: 'broadcast',
+            event: 'fin-juego',
+            payload: {}
+          });
+        }
+        return;
+      }
+
+      const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
+      gameState.respuestas.jugador1 = null;
+      gameState.respuestas.jugador2 = null;
+
+      DOM.preguntaTexto.textContent = pregunta.question;
+      DOM.contadorPreguntas.textContent = `Pregunta ${
+        gameState.preguntaIndex + 1
+      }/${gameState.preguntasFiltradas.length}`;
+
+      DOM.contenedorRespuestas.innerHTML = '';
+
+      const respuestasMezcladas = [...pregunta.answers];
+      for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [respuestasMezcladas[i], respuestasMezcladas[j]] = [
+          respuestasMezcladas[j],
+          respuestasMezcladas[i]
+        ];
+      }
+
+      respuestasMezcladas.forEach((respuesta, i) => {
+        const boton = document.createElement('button');
+        boton.className =
+          'respuesta-btn p-4 bg-gray-800 rounded-lg text-lg mb-2 md:mb-0 hover:bg-gray-700 transition-all';
+        boton.textContent = `${String.fromCharCode(65 + i)}. ${respuesta.text}`;
+        boton.dataset.index = i;
+        boton.dataset.correct = respuesta.correct;
+
+        if (gameState.rol === 'jugador') {
+          boton.addEventListener('click', () => seleccionarRespuesta(i));
         }
 
-        function mostrarPregunta() {
-            if (gameState.preguntaIndex >= gameState.preguntasFiltradas.length) {
-                if (gameState.rol === 'admin') {
-                    gameState.channel.send({
-                        type: 'broadcast',
-                        event: 'fin-juego',
-                        payload: {}
-                    });
-                }
-                return;
-            }
+        DOM.contenedorRespuestas.appendChild(boton);
+      });
 
-            const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
-            gameState.respuestas = { jugador1: null, jugador2: null };
-            
-            DOM.preguntaTexto.textContent = pregunta.question;
-            DOM.contadorPreguntas.textContent = `Pregunta ${gameState.preguntaIndex + 1}/${gameState.preguntasFiltradas.length}`;
-            DOM.contenedorRespuestas.innerHTML = '';
-            
-            const respuestasMezcladas = [...pregunta.answers];
-            for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [respuestasMezcladas[i], respuestasMezcladas[j]] = [respuestasMezcladas[j], respuestasMezcladas[i]];
-            }
-            
-            respuestasMezcladas.forEach((respuesta, i) => {
-                const boton = document.createElement('button');
-                boton.className = 'respuesta-btn p-4 bg-gray-800 rounded-lg text-lg mb-2 md:mb-0 hover:bg-gray-700 transition-all';
-                boton.textContent = `${String.fromCharCode(65 + i)}. ${respuesta.text}`;
-                boton.dataset.index = i;
-                boton.dataset.correct = respuesta.correct;
-                
-                if (gameState.rol === 'jugador') {
-                    boton.addEventListener('click', () => seleccionarRespuesta(i));
-                }
-                
-                DOM.contenedorRespuestas.appendChild(boton);
-            });
-            
-            DOM.btnSiguientePregunta.classList.add('hidden');
-            iniciarCronometro();
+      DOM.btnSiguientePregunta.classList.add('hidden');
+      iniciarCronometro();
+    }
+
+    function seleccionarRespuesta(index) {
+      gameState.respuestas[`jugador${gameState.jugadorNumero}`] = index;
+
+      gameState.channel.send({
+        type: 'broadcast',
+        event: 'respuesta-seleccionada',
+        payload: {
+          jugador: gameState.jugadorNumero,
+          respuestaIndex: index
+        }
+      });
+
+      actualizarEstilosRespuestas();
+    }
+
+    function actualizarEstilosRespuestas() {
+      document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
+        btn.classList.remove('seleccion-jugador1', 'seleccion-jugador2', 'seleccion-ambos');
+        const esJ1 = gameState.respuestas.jugador1 === i;
+        const esJ2 = gameState.respuestas.jugador2 === i;
+
+        if (esJ1 && esJ2) {
+          btn.classList.add('seleccion-ambos');
+        } else if (esJ1) {
+          btn.classList.add('seleccion-jugador1');
+        } else if (esJ2) {
+          btn.classList.add('seleccion-jugador2');
+        }
+      });
+    }
+
+    function iniciarCronometro() {
+      gameState.tiempoRestante = gameState.TIEMPO_POR_PREGUNTA;
+      actualizarCronometroVisual();
+
+      if (gameState.rol === 'admin') {
+        audioSystem.loop('tick');
+      }
+
+      gameState.timerInterval = setInterval(() => {
+        gameState.tiempoRestante--;
+        actualizarCronometroVisual();
+
+        if (gameState.tiempoRestante === 3) {
+          DOM.cronometroCircle.classList.add('danger');
+        } else if (gameState.tiempoRestante === 5) {
+          DOM.cronometroCircle.classList.add('warning');
         }
 
-        function seleccionarRespuesta(index) {
-            gameState.respuestas[`jugador${gameState.jugadorNumero}`] = index;
-            
-            gameState.channel.send({
-                type: 'broadcast',
-                event: 'respuesta-seleccionada',
-                payload: {
-                    jugador: gameState.jugadorNumero,
-                    respuestaIndex: index
-                }
-            });
-            
-            actualizarEstilosRespuestas();
+        if (gameState.tiempoRestante <= 0) {
+          tiempoAgotado();
         }
+      }, 1000);
+    }
 
-        function actualizarEstilosRespuestas() {
-            document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
-                btn.classList.remove('seleccion-jugador1', 'seleccion-jugador2', 'seleccion-ambos');
-                
-                const esJ1 = gameState.respuestas.jugador1 === i;
-                const esJ2 = gameState.respuestas.jugador2 === i;
-                
-                if (esJ1 && esJ2) {
-                    btn.classList.add('seleccion-ambos');
-                } else if (esJ1) {
-                    btn.classList.add('seleccion-jugador1');
-                } else if (esJ2) {
-                    btn.classList.add('seleccion-jugador2');
-                }
-            });
+    function actualizarCronometroVisual() {
+      DOM.cronometroTexto.textContent = gameState.tiempoRestante;
+      const circumference = 314;
+      const offset =
+        circumference -
+        (gameState.tiempoRestante / gameState.TIEMPO_POR_PREGUNTA) * circumference;
+      DOM.cronometroCircle.style.strokeDashoffset = offset;
+    }
+
+    function detenerCronometro() {
+      clearInterval(gameState.timerInterval);
+      if (gameState.rol === 'admin') {
+        audioSystem.stop('tick');
+      }
+      DOM.cronometroCircle.classList.remove('warning', 'danger');
+    }
+
+    function tiempoAgotado() {
+      detenerCronometro();
+
+      if (gameState.rol === 'admin') {
+        audioSystem.play('timeout');
+      }
+
+      document.querySelectorAll('.respuesta-btn').forEach((btn) => {
+        btn.disabled = true;
+      });
+
+      verificarRespuestas();
+    }
+
+    function verificarRespuestas() {
+      detenerCronometro();
+
+      let respuestaCorrecta = null;
+      const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
+
+      document.querySelectorAll('.respuesta-btn').forEach((btn) => {
+        btn.disabled = true;
+        if (btn.dataset.correct === 'true') {
+          btn.classList.add('respuesta-correcta');
+          respuestaCorrecta = parseInt(btn.dataset.index, 10);
         }
+      });
 
-        function iniciarCronometro() {
-            gameState.tiempoRestante = gameState.TIEMPO_POR_PREGUNTA;
-            actualizarCronometroVisual();
-            
-            if (gameState.rol === 'admin') {
-                audioSystem.loop('tick');
-            }
-            
-            gameState.timerInterval = setInterval(() => {
-                gameState.tiempoRestante--;
-                actualizarCronometroVisual();
-                
-                if (gameState.tiempoRestante <= 3) {
-                    DOM.cronometroCircle.classList.add('danger');
-                } else if (gameState.tiempoRestante <= 5) {
-                    DOM.cronometroCircle.classList.add('warning');
-                }
-                
-                if (gameState.tiempoRestante <= 0) {
-                    tiempoAgotado();
-                }
-            }, 1000);
+      const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category] || 10;
+
+      if (gameState.respuestas.jugador1 === respuestaCorrecta) {
+        gameState.puntajes.jugador1 += puntos;
+        gameState.respuestasCorrectas.jugador1++;
+        if (gameState.rol === 'admin') {
+          audioSystem.play('correct');
         }
-
-        function actualizarCronometroVisual() {
-            DOM.cronometroTexto.textContent = gameState.tiempoRestante;
-            const circumference = 314;
-            const offset = circumference - (gameState.tiempoRestante / gameState.TIEMPO_POR_PREGUNTA) * circumference;
-            DOM.cronometroCircle.style.strokeDashoffset = offset;
+      } else if (gameState.respuestas.jugador1 !== null) {
+        if (gameState.rol === 'admin') {
+          audioSystem.play('wrong');
         }
+      }
 
-        function detenerCronometro() {
-            clearInterval(gameState.timerInterval);
-            if (gameState.rol === 'admin') {
-                audioSystem.stop('tick');
-            }
-            DOM.cronometroCircle.classList.remove('warning', 'danger');
-        }
+      if (gameState.respuestas.jugador2 === respuestaCorrecta) {
+        gameState.puntajes.jugador2 += puntos;
+        gameState.respuestasCorrectas.jugador2++;
+      }
 
-        function tiempoAgotado() {
-            detenerCronometro();
-            
-            if (gameState.rol === 'admin') {
-                audioSystem.play('timeout');
-            }
-            
-            document.querySelectorAll('.respuesta-btn').forEach(btn => {
-                btn.disabled = true;
-            });
-            
-            verificarRespuestas();
-        }
+      DOM.puntosJ1.textContent = gameState.puntajes.jugador1;
+      DOM.puntosJ2.textContent = gameState.puntajes.jugador2;
 
-        function verificarRespuestas() {
-            detenerCronometro();
-            
-            let respuestaCorrecta = null;
-            const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
-            
-            document.querySelectorAll('.respuesta-btn').forEach(btn => {
-                btn.disabled = true;
-                if (btn.dataset.correct === 'true') {
-                    btn.classList.add('respuesta-correcta');
-                    respuestaCorrecta = parseInt(btn.dataset.index);
-                }
-            });
-            
-            const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category];
-            
-            if (gameState.respuestas.jugador1 === respuestaCorrecta) {
-                gameState.puntajes.jugador1 += puntos;
-                gameState.respuestasCorrectas.jugador1++;
-                if (gameState.rol === 'admin') audioSystem.play('correct');
-            } else if (gameState.respuestas.jugador1 !== null) {
-                if (gameState.rol === 'admin') audioSystem.play('wrong');
-            }
-            
-            if (gameState.respuestas.jugador2 === respuestaCorrecta) {
-                gameState.puntajes.jugador2 += puntos;
-                gameState.respuestasCorrectas.jugador2++;
-            }
-            
-            DOM.puntosJ1.textContent = gameState.puntajes.jugador1;
-            DOM.puntosJ2.textContent = gameState.puntajes.jugador2;
-            
-            if (gameState.rol === 'admin') {
-                DOM.btnSiguientePregunta.classList.remove('hidden');
-            }
-        }
+      if (gameState.rol === 'admin') {
+        DOM.btnSiguientePregunta.classList.remove('hidden');
+      }
+    }
 
-        DOM.btnSiguientePregunta.addEventListener('click', () => {
-            gameState.channel.send({
-                type: 'broadcast',
-                event: 'siguiente-pregunta',
-                payload: {}
-            });
-        });
+    DOM.btnSiguientePregunta.addEventListener('click', () => {
+      gameState.channel.send({
+        type: 'broadcast',
+        event: 'siguiente-pregunta',
+        payload: {}
+      });
+    });
 
-        function finalizarJuego() {
-            mostrarPantalla(DOM.pantallaResumen);
-            
-            const totalPreguntas = gameState.preguntasFiltradas.length;
-            const puntosJ1 = gameState.puntajes.jugador1;
-            const puntosJ2 = gameState.puntajes.jugador2;
-            const correctasJ1 = gameState.respuestasCorrectas.jugador1;
-            const correctasJ2 = gameState.respuestasCorrectas.jugador2;
-            const precisionJ1 = Math.round((correctasJ1 / totalPreguntas) * 100);
-            const precisionJ2 = Math.round((correctasJ2 / totalPreguntas) * 100);
-            
-            // Actualizar nombres en resumen
-            DOM.nombreResumenJ1.textContent = gameState.nombresJugadores.jugador1;
-            DOM.nombreResumenJ2.textContent = gameState.nombresJugadores.jugador2;
-            
-            document.getElementById('puntajeFinalJ1').textContent = puntosJ1;
-            document.getElementById('correctasJ1').textContent = correctasJ1;
-            document.getElementById('precisionJ1').textContent = precisionJ1 + '%';
-            
-            document.getElementById('puntajeFinalJ2').textContent = puntosJ2;
-            document.getElementById('correctasJ2').textContent = correctasJ2;
-            document.getElementById('precisionJ2').textContent = precisionJ2 + '%';
-            
-            const cardJ1 = document.getElementById('cardResumenJ1');
-            const cardJ2 = document.getElementById('cardResumenJ2');
-            const tituloGanador = document.getElementById('tituloGanador');
-            
-            cardJ1.classList.remove('ganador');
-            cardJ2.classList.remove('ganador');
-            
-            if (puntosJ1 > puntosJ2) {
-                tituloGanador.textContent = `🎉 ¡${gameState.nombresJugadores.jugador1.toUpperCase()} GANA! 🎉`;
-                cardJ1.classList.add('ganador');
-            } else if (puntosJ2 > puntosJ1) {
-                tituloGanador.textContent = `🎉 ¡${gameState.nombresJugadores.jugador2.toUpperCase()} GANA! 🎉`;
-                cardJ2.classList.add('ganador');
-            } else {
-                tituloGanador.textContent = '🤝 ¡EMPATE! 🤝';
-                cardJ1.classList.add('ganador');
-                cardJ2.classList.add('ganador');
-            }
-        }
+    function finalizarJuego() {
+      mostrarPantalla(DOM.pantallaResumen);
 
-        function volverAlInicio() {
-            if (gameState.channel) {
-                gameState.channel.unsubscribe();
-            }
-            
-            detenerCronometro();
-            
-            gameState.salaId = null;
-            gameState.jugadorNumero = null;
-            gameState.nombreJugador = null;
-            gameState.nombresJugadores = { jugador1: 'Jugador 1', jugador2: 'Jugador 2' };
-            gameState.channel = null;
-            gameState.preguntaIndex = 0;
-            gameState.rol = null;
-            
-            mostrarPantalla(DOM.pantallaRol);
-            
-            DOM.categorias.forEach(c => c.classList.remove('selected'));
-            DOM.btnCrearSala.classList.add('hidden');
-            DOM.inputCodigoSala.value = '';
-            DOM.inputNombreJugador.value = '';
-        }
+      const totalPreguntas = gameState.preguntasFiltradas.length;
+      const puntosJ1 = gameState.puntajes.jugador1;
+      const puntosJ2 = gameState.puntajes.jugador2;
+      const correctasJ1 = gameState.respuestasCorrectas.jugador1;
+      const correctasJ2 = gameState.respuestasCorrectas.jugador2;
+      const precisionJ1 = totalPreguntas
+        ? Math.round((correctasJ1 / totalPreguntas) * 100)
+        : 0;
+      const precisionJ2 = totalPreguntas
+        ? Math.round((correctasJ2 / totalPreguntas) * 100)
+        : 0;
 
-        DOM.btnCancelarSala.addEventListener('click', volverAlInicio);
-        DOM.btnSalirJuego.addEventListener('click', () => {
-            if (confirm('¿Seguro que deseas salir del juego?')) {
-                volverAlInicio();
-            }
-        });
-        DOM.btnVolverInicio.addEventListener('click', volverAlInicio);
+      DOM.nombreResumenJ1.textContent = gameState.nombresJugadores.jugador1;
+      DOM.nombreResumenJ2.textContent = gameState.nombresJugadores.jugador2;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            audioSystem.init();
-        });
-    </script>
+      document.getElementById('puntajeFinalJ1').textContent = puntosJ1;
+      document.getElementById('correctasJ1').textContent = correctasJ1;
+      document.getElementById('precisionJ1').textContent = `${precisionJ1}%`;
+
+      document.getElementById('puntajeFinalJ2').textContent = puntosJ2;
+      document.getElementById('correctasJ2').textContent = correctasJ2;
+      document.getElementById('precisionJ2').textContent = `${precisionJ2}%`;
+
+      const cardJ1 = document.getElementById('cardResumenJ1');
+      const cardJ2 = document.getElementById('cardResumenJ2');
+      const tituloGanador = document.getElementById('tituloGanador');
+
+      cardJ1.classList.remove('ganador');
+      cardJ2.classList.remove('ganador');
+
+      if (puntosJ1 > puntosJ2) {
+        tituloGanador.textContent = `${gameState.nombresJugadores.jugador1.toUpperCase()} GANA!`;
+        cardJ1.classList.add('ganador');
+      } else if (puntosJ2 > puntosJ1) {
+        tituloGanador.textContent = `${gameState.nombresJugadores.jugador2.toUpperCase()} GANA!`;
+        cardJ2.classList.add('ganador');
+      } else {
+        tituloGanador.textContent = 'EMPATE!';
+        cardJ1.classList.add('ganador');
+        cardJ2.classList.add('ganador');
+      }
+    }
+
+    function volverAlInicio() {
+      if (gameState.channel) {
+        gameState.channel.unsubscribe();
+      }
+      detenerCronometro();
+
+      gameState.salaId = null;
+      gameState.jugadorNumero = null;
+      gameState.nombreJugador = null;
+      gameState.socketId = null;
+      gameState.nombresJugadores = {
+        jugador1: 'Jugador 1',
+        jugador2: 'Jugador 2'
+      };
+      gameState.channel = null;
+      gameState.preguntaIndex = 0;
+      gameState.rol = null;
+      gameState.jugadoresConectados = {
+        jugador1: false,
+        jugador2: false
+      };
+
+      mostrarPantalla(DOM.pantallaRol);
+      DOM.categorias.forEach((c) => c.classList.remove('selected'));
+      DOM.btnCrearSala.classList.add('hidden');
+      DOM.inputCodigoSala.value = '';
+      DOM.inputNombreJugador.value = '';
+      document.getElementById('nombreJ1').textContent = 'Esperando...';
+      document.getElementById('nombreJ2').textContent = 'Esperando...';
+      document.getElementById('loaderEspera').classList.remove('hidden');
+      document.getElementById('textoEspera').textContent =
+        'Esperando que se unan los jugadores...';
+      DOM.btnIniciarJuego.classList.add('hidden');
+    }
+
+    DOM.btnCancelarSala.addEventListener('click', volverAlInicio);
+
+    DOM.btnSalirJuego.addEventListener('click', () => {
+      if (confirm('¿Seguro que deseas salir del juego?')) {
+        volverAlInicio();
+      }
+    });
+
+    DOM.btnVolverInicio.addEventListener('click', volverAlInicio);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      audioSystem.init();
+    });
+  </script>
 </body>
 </html>
