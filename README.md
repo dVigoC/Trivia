@@ -10,17 +10,15 @@ Tu app estará disponible en: `https://tu-usuario.github.io/trivia-biblica/`
 
 ## 🎯 Cómo Jugar
 
-### Jugador 1 (Creador de Sala)
+### Admin (Creador de Sala)
 1. Selecciona una categoría (Sansón, David o Elías)
 2. Click en "CREAR SALA"
-3. Escribe "CREAR"
-4. Comparte el código de 6 dígitos con tu oponente
+4. Comparte el código de 6 dígitos con los oponente
 
-### Jugador 2 (Se une a sala)
-1. Selecciona la misma categoría
-2. Click en "CREAR SALA"
-3. Ingresa el código de 6 dígitos
-4. Espera a que inicie el juego
+### Jugadores (Se unen a la sala)
+1. Ingresan Nombre
+2. Ingresa el código de 6 dígitos
+3. Espera a que inicie el juego
 
 ### Durante el Juego
 - Ambos jugadores ven el cronómetro sincronizado de 10 segundos
