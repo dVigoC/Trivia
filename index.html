@@ -529,7 +529,7 @@
 
       <button
         id="btnIniciarJuego"
-        class="hidden px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-lg font-bold shadow-lg hover:scale-105 transition mb-4"
+        class="hidden px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-lg font-bold shadow-lg hover:scale-105 transition mb-4"
       >
         INICIAR JUEGO
       </button>
@@ -577,7 +577,7 @@
     </div>
 
     <!-- Marcadores de puntuación con nombres -->
-    <div class="flex justify-center gap-4 mb-6">
+    <div id="marcadoresPuntos" class="flex justify-center gap-4 mb-6">
       <div class="bg-blue-900 px-6 py-3 rounded-lg">
         <p class="text-xs text-blue-300" id="labelJ1">Jugador 1</p>
         <p class="text-3xl font-bold" id="puntosJ1">0</p>
@@ -985,9 +985,8 @@
         .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
           gameState.categoriaSeleccionada = payload.categoria;
           gameState.nombresJugadores = payload.nombres;
-          iniciarJuegoMultijugador(payload.preguntas); // NUEVO: pasar las preguntas
+          iniciarJuegoMultijugador(payload.preguntas);
         })
-
         .on('broadcast', { event: 'siguiente-pregunta' }, () => {
           gameState.preguntaIndex++;
           mostrarPregunta();
@@ -1031,9 +1030,8 @@
           }
 
           console.log('Mi número de jugador:', gameState.jugadorNumero);
-          iniciarJuegoMultijugador(payload.preguntas); // NUEVO: pasar las preguntas
+          iniciarJuegoMultijugador(payload.preguntas);
         })
-
         .on('broadcast', { event: 'siguiente-pregunta' }, () => {
           gameState.preguntaIndex++;
           mostrarPregunta();
@@ -1049,7 +1047,6 @@
           console.log('Jugador subscribe status:', status);
           
           if (status === 'SUBSCRIBED') {
-            // Enviar evento de conexión al admin
             console.log('Enviando jugador-conectado con nombre:', gameState.nombreJugador);
             
             await gameState.channel.send({
@@ -1073,7 +1070,7 @@
     DOM.btnIniciarJuego.addEventListener('click', () => {
       console.log('Admin inicia juego con nombres:', gameState.nombresJugadores);
       
-      // NUEVO: El admin mezcla las preguntas AQUÍ
+      // Filtrar preguntas por categoría
       const preguntasFiltradas = preguntas.filter(
         (p) => p.category === gameState.categoriaSeleccionada
       );
@@ -1087,7 +1084,26 @@
         ];
       }
 
-      const preguntasParaEnviar = preguntasFiltradas.slice(0, gameState.MAXPREGUNTAS);
+      const preguntasSeleccionadas = preguntasFiltradas.slice(0, gameState.MAXPREGUNTAS);
+      
+      // Mezclar también las respuestas de cada pregunta
+      const preguntasConRespuestasMezcladas = preguntasSeleccionadas.map(pregunta => {
+        const respuestasMezcladas = [...pregunta.answers];
+        
+        // Mezclar respuestas
+        for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [respuestasMezcladas[i], respuestasMezcladas[j]] = [
+            respuestasMezcladas[j],
+            respuestasMezcladas[i]
+          ];
+        }
+        
+        return {
+          ...pregunta,
+          answers: respuestasMezcladas
+        };
+      });
       
       gameState.channel.send({
         type: 'broadcast',
@@ -1095,15 +1111,14 @@
         payload: {
           categoria: gameState.categoriaSeleccionada,
           nombres: gameState.nombresJugadores,
-          preguntas: preguntasParaEnviar // NUEVO: enviar las preguntas mezcladas
+          preguntas: preguntasConRespuestasMezcladas
         }
       });
     });
 
-
     // Lógica del juego
     function iniciarJuegoMultijugador(preguntasRecibidas = null) {
-      // Si recibimos preguntas (jugadores), usarlas. Si no (admin), mezclar localmente
+      // Si recibimos preguntas, usarlas. Si no (admin), mezclar localmente
       if (preguntasRecibidas) {
         gameState.preguntasFiltradas = preguntasRecibidas;
       } else {
@@ -1137,6 +1152,11 @@
 
       mostrarPantalla(DOM.pantallaJuego);
 
+      // Ocultar marcadores de puntos para jugadores
+      if (gameState.rol === 'jugador') {
+        document.getElementById('marcadoresPuntos').classList.add('hidden');
+      }
+
       if (gameState.rol === 'admin') {
         DOM.controlesAdmin.classList.remove('hidden');
         DOM.adminBadgeJuego.classList.remove('hidden');
@@ -1144,7 +1164,6 @@
 
       mostrarPregunta();
     }
-
 
     function mostrarPregunta() {
       if (gameState.preguntaIndex >= gameState.preguntasFiltradas.length) {
@@ -1168,16 +1187,10 @@
 
       DOM.contenedorRespuestas.innerHTML = '';
 
-      const respuestasMezcladas = [...pregunta.answers];
-      for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [respuestasMezcladas[i], respuestasMezcladas[j]] = [
-          respuestasMezcladas[j],
-          respuestasMezcladas[i]
-        ];
-      }
+      // NO mezclar, usar el orden que viene
+      const respuestas = pregunta.answers;
 
-      respuestasMezcladas.forEach((respuesta, i) => {
+      respuestas.forEach((respuesta, i) => {
         const boton = document.createElement('button');
         boton.className =
           'respuesta-btn p-4 bg-gray-800 rounded-lg text-lg mb-2 md:mb-0 hover:bg-gray-700 transition-all';
@@ -1405,12 +1418,14 @@
       document.getElementById('textoEspera').textContent =
         'Esperando que se unan los jugadores...';
       DOM.btnIniciarJuego.classList.add('hidden');
+      
+      // Mostrar nuevamente los marcadores si estaban ocultos
+      document.getElementById('marcadoresPuntos').classList.remove('hidden');
     }
 
     // Cancelar sala (ADMIN expulsa a todos)
     DOM.btnCancelarSala.addEventListener('click', () => {
       if (gameState.rol === 'admin' && gameState.channel) {
-        // Notificar a los jugadores que la sala fue cancelada
         gameState.channel.send({
           type: 'broadcast',
           event: 'sala-cancelada',
