@@ -101,16 +101,6 @@ const preguntas = [
       },
       {
         "category": "Fácil",
-        "question": "¿Quién escribió la mayoría de las cartas del Nuevo Testamento?",
-        "answers": [
-          { "text": "Pedro", "correct": false },
-          { "text": "Juan", "correct": false },
-          { "text": "Pablo", "correct": true },
-          { "text": "Mateo", "correct": false }
-        ]
-      },
-      {
-        "category": "Fácil",
         "question": "¿Cuál es el último libro de la Biblia?",
         "answers": [
           { "text": "Apocalipsis", "correct": true },
@@ -171,7 +161,7 @@ const preguntas = [
       },
       {
         "category": "Fácil",
-        "question": "¿Cuál es el nombre del jardín donde vivieron Adán y Eva?",
+        "question": "¿Cuál es el nombre del jardín donde estuvieron Adán y Eva?",
         "answers": [
           { "text": "Edén", "correct": true },
           { "text": "Getsemaní", "correct": false },
@@ -191,7 +181,7 @@ const preguntas = [
       },
       {
         "category": "Fácil",
-        "question": "¿Quién fue el profeta que fue llevado al cielo en un carro de fuego?",
+        "question": "¿Quién fue el profeta que fue llevado al cielo, en un carro de fuego?",
         "answers": [
           { "text": "Elías", "correct": true },
           { "text": "Eliseo", "correct": false },
@@ -237,16 +227,6 @@ const preguntas = [
           { "text": "Simeón", "correct": false },
           { "text": "Leví", "correct": false },
           { "text": "José", "correct": true }
-        ]
-      },
-      {
-        "category": "Fácil",
-        "question": "¿Quién fue el faraón que se negó a liberar a los israelitas de la esclavitud?",
-        "answers": [
-          { "text": "Ramsés II", "correct": true },
-          { "text": "Tutmosis III", "correct": false },
-          { "text": "Akenatón", "correct": false },
-          { "text": "Seti I", "correct": false }
         ]
       },
       {
@@ -351,36 +331,6 @@ const preguntas = [
       },
       {
         "category": "Fácil",
-        "question": "¿Cuál es el nombre del monte donde Moisés murió?",
-        "answers": [
-          { "text": "Sinaí", "correct": false },
-          { "text": "Nebo", "correct": true },
-          { "text": "Horeb", "correct": false },
-          { "text": "Carmelo", "correct": false }
-        ]
-      },
-      {
-        "category": "Fácil",
-        "question": "¿Quién fue el general del ejército de David?",
-        "answers": [
-          { "text": "Jonatán", "correct": false },
-          { "text": "Joab", "correct": true },
-          { "text": "Absalón", "correct": false },
-          { "text": "Adonías", "correct": false }
-        ]
-      },
-      {
-        "category": "Fácil",
-        "question": "¿Cuál es el nombre del profeta que reprendió a David por su pecado con Betsabé?",
-        "answers": [
-          { "text": "Elías", "correct": false },
-          { "text": "Natanael", "correct": false },
-          { "text": "Natán", "correct": true },
-          { "text": "Isaías", "correct": false }
-        ]
-      },
-      {
-        "category": "Fácil",
         "question": "¿Quién fue el rey que intentó matar a Jesús cuando era niño?",
         "answers": [
           { "text": "Herodes Antipas", "correct": false },
@@ -421,7 +371,7 @@ const preguntas = [
       },
       {
         "category": "Fácil",
-        "question": "¿Quién declaró Verdaderamente este hombre era Hijo de Dios?",
+        "question": "¿Quién declaró Verdaderamente este hombre era Hijo de Dios,NT?",
         "answers": [
           { "text": "Cornelio", "correct": false },
           { "text": "Julio", "correct": false },
@@ -510,6 +460,506 @@ const preguntas = [
         ]
       },
       {
+        "category": "Fácil",
+        "question": "¿Quién mató a Abel?",
+        "answers": [
+          { "text": "Adán", "correct": false },
+          { "text": "Caín", "correct": true },
+          { "text": "Set", "correct": false },
+          { "text": "Noé", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién construyó el primer templo en Jerusalén?",
+        "answers": [
+          { "text": "David", "correct": false },
+          { "text": "Salomón", "correct": true },
+          { "text": "Saúl", "correct": false },
+          { "text": "Moisés", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién tenía una túnica de muchos colores?",
+        "answers": [
+          { "text": "José", "correct": true },
+          { "text": "Benjamín", "correct": false },
+          { "text": "Judá", "correct": false },
+          { "text": "Rubén", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién traicionó a Jesús por 30 monedas de plata?",
+        "answers": [
+          { "text": "Pedro", "correct": false },
+          { "text": "Judas Iscariote", "correct": true },
+          { "text": "Tomás", "correct": false },
+          { "text": "Pilato", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién fue salvado de la destrucción de Sodoma?",
+        "answers": [
+          { "text": "Abraham", "correct": false },
+          { "text": "Lot", "correct": true },
+          { "text": "Noé", "correct": false },
+          { "text": "Isaac", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién se convirtió en una estatua de sal?",
+        "answers": [
+          { "text": "La esposa de Lot", "correct": true },
+          { "text": "Sara", "correct": false },
+          { "text": "Eva", "correct": false },
+          { "text": "La esposa de Noé", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué mar dividió Dios a través de Moisés?",
+        "answers": [
+          { "text": "Mar Muerto", "correct": false },
+          { "text": "Mar Rojo", "correct": true },
+          { "text": "Mar de Galilea", "correct": false },
+          { "text": "Mar Mediterráneo", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién fue el hermano de Moisés?",
+        "answers": [
+          { "text": "Josué", "correct": false },
+          { "text": "Aarón", "correct": true },
+          { "text": "Caleb", "correct": false },
+          { "text": "Jetro", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué comida cayó del cielo para los israelitas en el desierto?",
+        "answers": [
+          { "text": "Pan", "correct": false },
+          { "text": "Maná", "correct": true },
+          { "text": "Codornices", "correct": false },
+          { "text": "Higos", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué ciudad cayó después de que los israelitas marcharon alrededor de sus muros?",
+        "answers": [
+          { "text": "Jerusalén", "correct": false },
+          { "text": "Jericó", "correct": true },
+          { "text": "Ai", "correct": false },
+          { "text": "Babilonia", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién perdió su fuerza cuando le cortaron el cabello?",
+        "answers": [
+          { "text": "David", "correct": false },
+          { "text": "Sansón", "correct": true },
+          { "text": "Gedeón", "correct": false },
+          { "text": "Goliat", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién traicionó a Sansón revelando el secreto de su fuerza?",
+        "answers": [
+          { "text": "Rut", "correct": false },
+          { "text": "Dalila", "correct": true },
+          { "text": "Ester", "correct": false },
+          { "text": "Jezabel", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué instrumento tocaba David para calmar al rey Saúl?",
+        "answers": [
+          { "text": "Flauta", "correct": false },
+          { "text": "Arpa", "correct": true },
+          { "text": "Tambor", "correct": false },
+          { "text": "Trompeta", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién fue el mejor amigo de David e hijo del rey Saúl?",
+        "answers": [
+          { "text": "Absalón", "correct": false },
+          { "text": "Jonatán", "correct": true },
+          { "text": "Salomón", "correct": false },
+          { "text": "Joab", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quiénes fueron arrojados al horno de fuego ardiente?",
+        "answers": [
+          { "text": "Daniel y sus amigos", "correct": false },
+          { "text": "Sadrac, Mesac y Abed-nego", "correct": true },
+          { "text": "Moisés y Aarón", "correct": false },
+          { "text": "José y sus hermanos", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué profeta es conocido como el 'profeta llorón'?",
+        "answers": [
+          { "text": "Isaías", "correct": false },
+          { "text": "Jeremías", "correct": true },
+          { "text": "Ezequiel", "correct": false },
+          { "text": "Oseas", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Cuál era el oficio de José, el padre terrenal de Jesús?",
+        "answers": [
+          { "text": "Pescador", "correct": false },
+          { "text": "Carpintero", "correct": true },
+          { "text": "Pastor", "correct": false },
+          { "text": "Recaudador de impuestos", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué ángel anunció el nacimiento de Jesús a María?",
+        "answers": [
+          { "text": "Miguel", "correct": false },
+          { "text": "Gabriel", "correct": true },
+          { "text": "Rafael", "correct": false },
+          { "text": "Uriel", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué regalos llevaron los magos a Jesús?",
+        "answers": [
+          { "text": "Oro, plata y bronce", "correct": false },
+          { "text": "Oro, incienso y mirra", "correct": true },
+          { "text": "Ropa, comida y dinero", "correct": false },
+          { "text": "Ovejas, camellos y burros", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Cuál fue el primer milagro de Jesús?",
+        "answers": [
+          { "text": "Caminar sobre el agua", "correct": false },
+          { "text": "Convertir agua en vino", "correct": true },
+          { "text": "Alimentar a los 5000", "correct": false },
+          { "text": "Sanar a un ciego", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿A quién resucitó Jesús después de que llevara cuatro días muerto?",
+        "answers": [
+          { "text": "Jairo", "correct": false },
+          { "text": "Lázaro", "correct": true },
+          { "text": "El hijo de la viuda", "correct": false },
+          { "text": "Zaqueo", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿A qué profeta llamó Dios por su nombre cuando era un niño?",
+        "answers": [
+          { "text": "David", "correct": false },
+          { "text": "Samuel", "correct": true },
+          { "text": "Daniel", "correct": false },
+          { "text": "Isaías", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué hombre bajito se subió a un árbol para ver a Jesús?",
+        "answers": [
+          { "text": "Mateo", "correct": false },
+          { "text": "Zaqueo", "correct": true },
+          { "text": "Nicodemo", "correct": false },
+          { "text": "Bartimeo", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién se lavó las manos simbólicamente durante el juicio de Jesús?",
+        "answers": [
+          { "text": "Herodes", "correct": false },
+          { "text": "Poncio Pilato", "correct": true },
+          { "text": "Caifás", "correct": false },
+          { "text": "Anás", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿A qué prisionero liberó el pueblo en lugar de a Jesús?",
+        "answers": [
+          { "text": "Dimas", "correct": false },
+          { "text": "Barrabás", "correct": true },
+          { "text": "Gestas", "correct": false },
+          { "text": "Judas", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿En qué día descendió el Espíritu Santo sobre los discípulos?",
+        "answers": [
+          { "text": "Pascua", "correct": false },
+          { "text": "Pentecostés", "correct": true },
+          { "text": "Tabernáculos", "correct": false },
+          { "text": "Sábado", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién quedó ciego en el camino a Damasco?",
+        "answers": [
+          { "text": "Pedro", "correct": false },
+          { "text": "Saulo (Pablo)", "correct": true },
+          { "text": "Esteban", "correct": false },
+          { "text": "Felipe", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué evangelista era médico de profesión?",
+        "answers": [
+          { "text": "Mateo", "correct": false },
+          { "text": "Lucas", "correct": true },
+          { "text": "Marcos", "correct": false },
+          { "text": "Juan", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué río se convirtió en sangre durante las plagas de Egipto?",
+        "answers": [
+          { "text": "Jordán", "correct": false },
+          { "text": "Nilo", "correct": true },
+          { "text": "Éufrates", "correct": false },
+          { "text": "Tigris", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién lideró a los israelitas a la Tierra Prometida después de Moisés?",
+        "answers": [
+          { "text": "Caleb", "correct": false },
+          { "text": "Josué", "correct": true },
+          { "text": "Aarón", "correct": false },
+          { "text": "Gedeón", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién vendió su primogenitura por un plato de lentejas?",
+        "answers": [
+          { "text": "Jacob", "correct": false },
+          { "text": "Esaú", "correct": true },
+          { "text": "Isaac", "correct": false },
+          { "text": "José", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién fue puesto en una canasta en el río cuando era un bebé?",
+        "answers": [
+          { "text": "Noé", "correct": false },
+          { "text": "Moisés", "correct": true },
+          { "text": "Samuel", "correct": false },
+          { "text": "David", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Cuál es el mandamiento más importante según el señor Jesús?",
+        "answers": [
+          { "text": "No matarás", "correct": false },
+          { "text": "Amar a Dios sobre todas las cosas", "correct": true },
+          { "text": "Honrar a padre y madre", "correct": false },
+          { "text": "No robarás", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién fue la primera persona en ver al maestro resucitado?",
+        "answers": [
+          { "text": "Pedro", "correct": false },
+          { "text": "María Magdalena", "correct": true },
+          { "text": "Juan", "correct": false },
+          { "text": "Tomás", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Cuántas plagas envió Dios a Egipto?",
+        "answers": [
+          { "text": "7", "correct": false },
+          { "text": "10", "correct": true },
+          { "text": "12", "correct": false },
+          { "text": "3", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué arma usó David para derrotar a Goliat?",
+        "answers": [
+          { "text": "Una espada", "correct": false },
+          { "text": "Una honda y una piedra", "correct": true },
+          { "text": "Un arco y flecha", "correct": false },
+          { "text": "Una lanza", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Quién es conocido como el 'Padre de la Fe'?",
+        "answers": [
+          { "text": "Moisés", "correct": false },
+          { "text": "Abraham", "correct": true },
+          { "text": "David", "correct": false },
+          { "text": "Pablo", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Qué rey de Babilonia vivió como un animal por un tiempo?",
+        "answers": [
+          { "text": "Belsasar", "correct": false },
+          { "text": "Nabucodonosor", "correct": true },
+          { "text": "Darío", "correct": false },
+          { "text": "Ciro", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Cómo se llamaba la madre de Juan el Bautista?",
+        "answers": [
+          { "text": "María", "correct": false },
+          { "text": "Elisabet", "correct": true },
+          { "text": "Ana", "correct": false },
+          { "text": "Marta", "correct": false }
+        ]
+      },
+      {
+        "category": "Fácil",
+        "question": "¿Cómo se llamaba el padre de Juan el Bautista?",
+        "answers": [
+          { "text": "José", "correct": false },
+          { "text": "Zacarías", "correct": true },
+          { "text": "Simeón", "correct": false },
+          { "text": "Elcana", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué mujer pidió la cabeza de Juan el Bautista en una bandeja?",
+        "answers": [
+          { "text": "Jezabel", "correct": false },
+          { "text": "La hija de Herodías", "correct": true },
+          { "text": "Dalila", "correct": false },
+          { "text": "Ester", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿En qué mar calmó Jesús la tormenta?",
+        "answers": [
+          { "text": "Mar Rojo", "correct": false },
+          { "text": "Mar de Galilea", "correct": true },
+          { "text": "Mar Muerto", "correct": false },
+          { "text": "Río Jordán", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿En qué libro de la Biblia se mencionan los 'frutos del Espíritu'?",
+        "answers": [
+          { "text": "Romanos", "correct": false },
+          { "text": "Gálatas", "correct": true },
+          { "text": "Efesios", "correct": false },
+          { "text": "Hebreos", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué ídolo hicieron los israelitas mientras Moisés estaba en el monte?",
+        "answers": [
+          { "text": "Una serpiente de bronce", "correct": false },
+          { "text": "Un becerro de oro", "correct": true },
+          { "text": "Una estatua de Baal", "correct": false },
+          { "text": "Un águila de plata", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cuál es el nombre del profeta que reprendió a David por su pecado con Betsabé?",
+        "answers": [
+          { "text": "Elías", "correct": false },
+          { "text": "Natanael", "correct": false },
+          { "text": "Natán", "correct": true },
+          { "text": "Isaías", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién fue el general del ejército de David?",
+        "answers": [
+          { "text": "Jonatán", "correct": false },
+          { "text": "Joab", "correct": true },
+          { "text": "Absalón", "correct": false },
+          { "text": "Adonías", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cuál es el nombre del monte donde Moisés murió?",
+        "answers": [
+          { "text": "Sinaí", "correct": false },
+          { "text": "Nebo", "correct": true },
+          { "text": "Horeb", "correct": false },
+          { "text": "Carmelo", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién fue el faraón que se negó a liberar a los israelitas de la esclavitud?",
+        "answers": [
+          { "text": "Ramsés II", "correct": true },
+          { "text": "Tutmosis III", "correct": false },
+          { "text": "Akenatón", "correct": false },
+          { "text": "Seti I", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién caminó sobre el agua hacia Jesús?",
+        "answers": [
+          { "text": "Juan", "correct": false },
+          { "text": "Pedro", "correct": true },
+          { "text": "Santiago", "correct": false },
+          { "text": "Andrés", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién escribió la mayoría de las cartas del Nuevo Testamento?",
+        "answers": [
+          { "text": "Pedro", "correct": false },
+          { "text": "Juan", "correct": false },
+          { "text": "Pablo", "correct": true },
+          { "text": "Mateo", "correct": false }
+        ]
+      },
+      {
         "category": "Medio",
         "question": "¿Cuál fue el nombre del profeta que predijo el nacimiento de Juan el Bautista?",
         "answers": [
@@ -547,16 +997,6 @@ const preguntas = [
           { "text": "David", "correct": true },
           { "text": "Salomón", "correct": false },
           { "text": "Josías", "correct": false }
-        ]
-      },
-      {
-        "category": "Medio",
-        "question": "¿Cuál fue el nombre del hermano de Moisés?",
-        "answers": [
-          { "text": "Aarón", "correct": true },
-          { "text": "Josué", "correct": false },
-          { "text": "Caleb", "correct": false },
-          { "text": "Finees", "correct": false }
         ]
       },
       {
@@ -752,6 +1192,16 @@ const preguntas = [
       },
       {
         "category": "Medio",
+        "question": "¿Cuál era el nombre hebreo de la reina Ester?",
+        "answers": [
+          { "text": "Hadasa", "correct": true },
+          { "text": "Mara", "correct": false },
+          { "text": "Noemí", "correct": false },
+          { "text": "Orfa", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
         "question": "¿Quién fue el maestro de Saulo?  Hechos 22:3",
         "answers": [
           { "text": "Anás", "correct": false },
@@ -832,16 +1282,6 @@ const preguntas = [
       },
       {
         "category": "Medio",
-        "question": "¿Quien resucito de los muertos?",
-        "answers": [
-          { "text": "Nicodemo", "correct": false },
-          { "text": "José de Arimatea", "correct": false },
-          { "text": "Simón de Cirene", "correct": false },
-          { "text": "Lázaro", "correct": true }
-        ]
-      },
-      {
-        "category": "Medio",
         "question": "¿Quién fue el fariseo que quedo ciego camino a Damasco?",
         "answers": [
           { "text": "Gamaliel", "correct": false },
@@ -852,7 +1292,7 @@ const preguntas = [
       },
       {
         "category": "Medio",
-        "question": "¿Quien fue libera de 7 espiritus?",
+        "question": "¿Quien fue liberada de 7 espiritus?",
         "answers": [
           { "text": "María Magdalena", "correct": true },
           { "text": "Marta", "correct": false },
@@ -942,7 +1382,7 @@ const preguntas = [
       },
       {
         "category": "Medio",
-        "question": "¿Cuál es el significado del nombre 'Boanerges'?",
+        "question": "¿Cuál es el significado dela palabra 'Boanerges'?",
         "answers": [
           { "text": "Hijos del trueno", "correct": true },
           { "text": "Siervos del Altísimo", "correct": false },
@@ -962,16 +1402,6 @@ const preguntas = [
       },
       {
         "category": "Medio",
-        "question": "¿Qué hombre subió a un árbol sicómoro para poder ver a Jesús?",
-        "answers": [
-          { "text": "Bartimeo", "correct": false },
-          { "text": "Zaqueo", "correct": true },
-          { "text": "Lázaro", "correct": false },
-          { "text": "Mateo", "correct": false }
-        ]
-      },
-      {
-        "category": "Medio",
         "question": "¿Cuál era la profesión de Mateo antes de ser discípulo de Jesús?",
         "answers": [
           { "text": "Pescador", "correct": false },
@@ -980,19 +1410,10 @@ const preguntas = [
           { "text": "Recaudador de impuestos", "correct": true }
         ]
       },
+      
       {
         "category": "Medio",
-        "question": "¿Quién vendió su primogenitura por un plato de lentejas?",
-        "answers": [
-          { "text": "Jacob", "correct": false },
-          { "text": "Esaú", "correct": true },
-          { "text": "Caín", "correct": false },
-          { "text": "Ismael", "correct": false }
-        ]
-      },
-      {
-        "category": "Medio",
-        "question": "¿Qué profeta recibió la orden de Dios de casarse con una mujer prostituta llamada Gomer?",
+        "question": "¿Qué profeta recibió la orden de Dios de casarse con una mujer prostituta, llamada Gomer?",
         "answers": [
           { "text": "Oseas", "correct": true },
           { "text": "Amós", "correct": false },
@@ -1002,22 +1423,12 @@ const preguntas = [
       },
       {
         "category": "Medio",
-        "question": "¿En qué monte reposó el arca de Noé cuando bajaron las aguas?",
+        "question": "¿En qué monte reposó el arca de Noé, cuando bajaron las aguas?",
         "answers": [
           { "text": "Monte Sinaí", "correct": false },
           { "text": "Monte Nebo", "correct": false },
           { "text": "Monte Ararat", "correct": true },
           { "text": "Monte de los Olivos", "correct": false }
-        ]
-      },
-      {
-        "category": "Medio",
-        "question": "¿Qué instrumento tocaba David para calmar el espíritu atormentado de Saúl?",
-        "answers": [
-          { "text": "La flauta", "correct": false },
-          { "text": "El arpa", "correct": true },
-          { "text": "El pandero", "correct": false },
-          { "text": "La trompeta", "correct": false }
         ]
       },
       {
@@ -1050,7 +1461,386 @@ const preguntas = [
           { "text": "Abraham", "correct": false }
         ]
       },
-    
+      {
+        "category": "Medio",
+        "question": "¿Quién fue la hermana de Moisés que vigiló la canasta en el Nilo?",
+        "answers": [
+          { "text": "Séfora", "correct": false },
+          { "text": "Miriam", "correct": true },
+          { "text": "Elisabet", "correct": false },
+          { "text": "Dina", "correct": false }
+        ]
+      }, 
+      {
+        "category": "Medio",
+        "question": "¿Quién sostuvo los brazos de Moisés durante la batalla contra Amalec?",
+        "answers": [
+          { "text": "Josué y Caleb", "correct": false },
+          { "text": "Aarón y Ur", "correct": true },
+          { "text": "Eleazar y Itamar", "correct": false },
+          { "text": "Nadab y Abiú", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cómo se llamaba el suegro de Moisés, sacerdote de Madián?",
+        "answers": [
+          { "text": "Jetro", "correct": true },
+          { "text": "Balac", "correct": false },
+          { "text": "Labán", "correct": false },
+          { "text": "Potifar", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué espía, junto con Josué, trajo un buen informe de la Tierra Prometida?",
+        "answers": [
+          { "text": "Coré", "correct": false },
+          { "text": "Caleb", "correct": true },
+          { "text": "Acán", "correct": false },
+          { "text": "Gedeón", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién robó del anatema en Jericó y causó la derrota en Hai?",
+        "answers": [
+          { "text": "Acán", "correct": true },
+          { "text": "Datán", "correct": false },
+          { "text": "Abiram", "correct": false },
+          { "text": "Gehazi", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién fue el padre del rey David?",
+        "answers": [
+          { "text": "Saúl", "correct": false },
+          { "text": "Isaí", "correct": true },
+          { "text": "Obed", "correct": false },
+          { "text": "Samuel", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué hija de Saúl fue la primera esposa de David?",
+        "answers": [
+          { "text": "Merab", "correct": false },
+          { "text": "Mical", "correct": true },
+          { "text": "Tamar", "correct": false },
+          { "text": "Abigail", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cómo se llamaba el hijo lisiado de Jonatán a quien David mostró misericordia?",
+        "answers": [
+          { "text": "Is-boset", "correct": false },
+          { "text": "Mefiboset", "correct": true },
+          { "text": "Absalón", "correct": false },
+          { "text": "Amnón", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién sucedió a Salomón y provocó la división del reino?",
+        "answers": [
+          { "text": "Jeroboam", "correct": false },
+          { "text": "Roboam", "correct": true },
+          { "text": "Asa", "correct": false },
+          { "text": "Josafat", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué escriba y sacerdote lideró un regreso del exilio y enseñó la Ley?",
+        "answers": [
+          { "text": "Nehemías", "correct": false },
+          { "text": "Esdras", "correct": true },
+          { "text": "Zorobabel", "correct": false },
+          { "text": "Hageo", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cómo se llamaba el primo de Ester que la adoptó?",
+        "answers": [
+          { "text": "Amán", "correct": false },
+          { "text": "Mardoqueo", "correct": true },
+          { "text": "Asuero", "correct": false },
+          { "text": "Hegai", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién fue el malvado que construyó una horca para Mardoqueo?",
+        "answers": [
+          { "text": "Asuero", "correct": false },
+          { "text": "Amán", "correct": true },
+          { "text": "Bigotán", "correct": false },
+          { "text": "Teres", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué profeta tuvo una visión de un valle de huesos secos?",
+        "answers": [
+          { "text": "Jeremías", "correct": false },
+          { "text": "Ezequiel", "correct": true },
+          { "text": "Daniel", "correct": false },
+          { "text": "Isaías", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cómo se llamaba el ciego que estaba sentado junto al camino en Jericó?",
+        "answers": [
+          { "text": "Zaqueo", "correct": false },
+          { "text": "Bartimeo", "correct": true },
+          { "text": "Lázaro", "correct": false },
+          { "text": "Malco", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿A la hija de quién resucitó Jesús?",
+        "answers": [
+          { "text": "De Nicodemo", "correct": false },
+          { "text": "De Jairo", "correct": true },
+          { "text": "De Caifás", "correct": false },
+          { "text": "De Zaqueo", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién pidió el cuerpo de Jesús a Pilato para sepultarlo?",
+        "answers": [
+          { "text": "Nicodemo", "correct": false },
+          { "text": "José de Arimatea", "correct": true },
+          { "text": "Simón de Cirene", "correct": false },
+          { "text": "Juan el apóstol", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿A qué siervo del sumo sacerdote le cortó la oreja Pedro?",
+        "answers": [
+          { "text": "Anás", "correct": false },
+          { "text": "Malco", "correct": true },
+          { "text": "Barrabás", "correct": false },
+          { "text": "Judas", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué discípulo reemplazó a Judas Iscariote?",
+        "answers": [
+          { "text": "Bernabé", "correct": false },
+          { "text": "Matías", "correct": true },
+          { "text": "Pablo", "correct": false },
+          { "text": "Silas", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cómo se llamaba la mujer de Ananías, que también mintió y murió?",
+        "answers": [
+          { "text": "Priscila", "correct": false },
+          { "text": "Safira", "correct": true },
+          { "text": "Lidia", "correct": false },
+          { "text": "Drusila", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién intentó comprar el poder del Espíritu Santo con dinero?",
+        "answers": [
+          { "text": "Elímas", "correct": false },
+          { "text": "Simón el Mago", "correct": true },
+          { "text": "Demetrio", "correct": false },
+          { "text": "Alejandro", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién acompañó a Pablo y cantó himnos con él en la prisión de Filipos?",
+        "answers": [
+          { "text": "Bernabé", "correct": false },
+          { "text": "Silas", "correct": true },
+          { "text": "Lucas", "correct": false },
+          { "text": "Tito", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién fue la vendedora de púrpura que se convirtió en Filipos?",
+        "answers": [
+          { "text": "Priscila", "correct": false },
+          { "text": "Lidia", "correct": true },
+          { "text": "Febe", "correct": false },
+          { "text": "Cloe", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Qué matrimonio fabricaba tiendas y trabajó con Pablo en Corinto?",
+        "answers": [
+          { "text": "Ananías y Safira", "correct": false },
+          { "text": "Aquila y Priscila", "correct": true },
+          { "text": "Andrónico y Junia", "correct": false },
+          { "text": "Filemón y Apia", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿En qué isla naufragó Pablo camino a Roma?",
+        "answers": [
+          { "text": "Creta", "correct": false },
+          { "text": "Malta", "correct": true },
+          { "text": "Chipre", "correct": false },
+          { "text": "Rodas", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cuál es la 'raíz de todos los males' según 1 Timoteo?",
+        "answers": [
+          { "text": "El orgullo", "correct": false },
+          { "text": "El amor al dinero", "correct": true },
+          { "text": "La envidia", "correct": false },
+          { "text": "La mentira", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿En qué isla recibió Juan la revelación del Apocalipsis?",
+        "answers": [
+          { "text": "Chipre", "correct": false },
+          { "text": "Patmos", "correct": true },
+          { "text": "Malta", "correct": false },
+          { "text": "Creta", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién fue el profeta calvo del cual se burlaron unos muchachos?",
+        "answers": [
+          { "text": "Elías", "correct": false },
+          { "text": "Eliseo", "correct": true },
+          { "text": "Samuel", "correct": false },
+          { "text": "Isaías", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién caminó con Dios y no murió, sino que fue llevado por Dios?",
+        "answers": [
+          { "text": "Moisés", "correct": false },
+          { "text": "Enoc", "correct": true },
+          { "text": "Abraham", "correct": false },
+          { "text": "Lázaro", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cómo se llamaba el oficial egipcio que compró a José?",
+        "answers": [
+          { "text": "Faraón", "correct": false },
+          { "text": "Potifar", "correct": true },
+          { "text": "Putifar", "correct": false },
+          { "text": "Ramsés", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Quién fue el hermano menor de José, hijo de Raquel?",
+        "answers": [
+          { "text": "Rubén", "correct": false },
+          { "text": "Benjamín", "correct": true },
+          { "text": "Judá", "correct": false },
+          { "text": "Dan", "correct": false }
+        ]
+      },
+      {
+        "category": "Medio",
+        "question": "¿Cómo se llamaba el padre de Saúl?",
+        "answers": [
+          { "text": "Cis", "correct": true },
+          { "text": "Ner", "correct": false },
+          { "text": "Abiel", "correct": false },
+          { "text": "Zeror", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué rey de Tiro envió madera y artesanos a Salomón para el templo?",
+        "answers": [
+          { "text": "Hiram", "correct": true },
+          { "text": "Ciro", "correct": false },
+          { "text": "Nabucodonosor", "correct": false },
+          { "text": "Senaquerib", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué rey dijo 'Por poco me persuades a ser cristiano'?",
+        "answers": [
+          { "text": "Herodes Antipas", "correct": false },
+          { "text": "Agripa II", "correct": true },
+          { "text": "Festo", "correct": false },
+          { "text": "Félix", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿A quién escribió Pablo una carta sobre un esclavo fugitivo?",
+        "answers": [
+          { "text": "Tito", "correct": false },
+          { "text": "Filemón", "correct": true },
+          { "text": "Timoteo", "correct": false },
+          { "text": "Gayo", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿A quién llamaban 'Hijo de Consolación?",
+        "answers": [
+          { "text": "Juan Marcos", "correct": false },
+          { "text": "Bernabé", "correct": true },
+          { "text": "Silas", "correct": false },
+          { "text": "Timoteo", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el gobernador romano que sucedió a Félix y juzgó a Pablo?",
+        "answers": [
+          { "text": "Pilato", "correct": false },
+          { "text": "Porcio Festo", "correct": true },
+          { "text": "Agripa", "correct": false },
+          { "text": "Galión", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el primer rey del reino del norte (Israel) tras la división?",
+        "answers": [
+          { "text": "Roboam", "correct": false },
+          { "text": "Jeroboam", "correct": true },
+          { "text": "Acab", "correct": false },
+          { "text": "Jehú", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién tocó el Arca del Pacto para sostenerla y murió al instante?",
+        "answers": [
+          { "text": "Uza", "correct": true },
+          { "text": "Ahío", "correct": false },
+          { "text": "Obed-edom", "correct": false },
+          { "text": "Hiram", "correct": false }
+        ]
+      },
      {
         "category": "Difícil",
         "question": "¿Quien fue designado por Jehova, para ejecutar toda obra de oro y plata para el tabernaculo?",
@@ -1546,7 +2336,7 @@ const preguntas = [
       },
       {
         "category": "Difícil",
-        "question": "¿Qué profeta rompió su capa nueva en doce pedazos para simbolizar la división del reino?",
+        "question": "¿Qué profeta rompió su capa nueva, en doce pedazos para simbolizar la división del reino?",
         "answers": [
           { "text": "Ahías", "correct": true },
           { "text": "Eliseo", "correct": false },
@@ -1596,16 +2386,6 @@ const preguntas = [
       },
       {
         "category": "Difícil",
-        "question": "¿Qué hombre murió repentinamente por tocar el Arca del Pacto cuando los bueyes tropezaron?",
-        "answers": [
-          { "text": "Uza", "correct": true },
-          { "text": "Ofni", "correct": false },
-          { "text": "Finees", "correct": false },
-          { "text": "Abinadab", "correct": false }
-        ]
-      },
-      {
-        "category": "Difícil",
         "question": "¿Quién fue el juez zurdo que mató al rey Eglón de Moab en su sala de verano?",
         "answers": [
           { "text": "Aod", "correct": true },
@@ -1633,6 +2413,416 @@ const preguntas = [
           { "text": "Esceva", "correct": false },
           { "text": "Himeneo", "correct": false }
         ]
-      }           
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el hombre que maldijo al rey David y le arrojó piedras mientras huía de Absalón?",
+        "answers": [
+          { "text": "Simei", "correct": true },
+          { "text": "Siba", "correct": false },
+          { "text": "Doeg", "correct": false },
+          { "text": "Nabal", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Cómo se llamaba la mujer que protegió los cuerpos de sus hijos ejecutados de las aves y las bestias por meses?",
+        "answers": [
+          { "text": "Rizpa", "correct": true },
+          { "text": "Merab", "correct": false },
+          { "text": "Hagar", "correct": false },
+          { "text": "Zilpa", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué rey de Israel reinó solamente por siete días?",
+        "answers": [
+          { "text": "Zimri", "correct": true },
+          { "text": "Omri", "correct": false },
+          { "text": "Nadab", "correct": false },
+          { "text": "Ela", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién mató al gigante que tenía seis dedos en cada mano y en cada pie?",
+        "answers": [
+          { "text": "Jonatán hijo de Simea", "correct": true },
+          { "text": "Abisai", "correct": false },
+          { "text": "Joab", "correct": false },
+          { "text": "Benaía", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué profetisa fue consultada por orden del rey Josías tras hallar el libro de la Ley?",
+        "answers": [
+          { "text": "Hulda", "correct": true },
+          { "text": "Noadías", "correct": false },
+          { "text": "Ana", "correct": false },
+          { "text": "Loida", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién descendió a un foso y mató a un león en un día de nieve?",
+        "answers": [
+          { "text": "Benaía", "correct": true },
+          { "text": "Abisai", "correct": false },
+          { "text": "Asahel", "correct": false },
+          { "text": "Eleazar", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué rey de Judá fue herido de lepra en la frente por intentar quemar incienso en el templo?",
+        "answers": [
+          { "text": "Uzías", "correct": true },
+          { "text": "Amasías", "correct": false },
+          { "text": "Jotam", "correct": false },
+          { "text": "Acaz", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el etíope que intercedió para sacar al profeta Jeremías de la cisterna?",
+        "answers": [
+          { "text": "Ebed-melec", "correct": true },
+          { "text": "Baruc", "correct": false },
+          { "text": "Guedalías", "correct": false },
+          { "text": "Pasur", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Cómo se llamaba el hombre que reconstruyó Jericó a costa de la vida de sus hijos?",
+        "answers": [
+          { "text": "Hiel de Betel", "correct": true },
+          { "text": "Nabote", "correct": false },
+          { "text": "Arauna", "correct": false },
+          { "text": "Semer", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué profeta predijo que los perros lamerían la sangre de Acab?",
+        "answers": [
+          { "text": "Elías", "correct": true },
+          { "text": "Micaías", "correct": false },
+          { "text": "Eliseo", "correct": false },
+          { "text": "Ahías", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Cómo se llamaba el profeta que ató sus manos y pies con el cinto de Pablo?",
+        "answers": [
+          { "text": "Agabo", "correct": true },
+          { "text": "Silas", "correct": false },
+          { "text": "Bernabé", "correct": false },
+          { "text": "Luci", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué miembro del Areópago creyó en la predicación de Pablo en Atenas?",
+        "answers": [
+          { "text": "Dionisio", "correct": true },
+          { "text": "Demetrio", "correct": false },
+          { "text": "Eutico", "correct": false },
+          { "text": "Aquila", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué miembro del Areópago creyó en la predicación de Pablo en Atenas?",
+        "answers": [
+          { "text": "Demas", "correct": false },
+          { "text": "Dámaris", "correct": true },
+          { "text": "Gayo", "correct": false },
+          { "text": "Jasón", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Cómo se llamaba la sirvienta que estaba tan contenta que olvidó abrir la puerta a Pedro?",
+        "answers": [
+          { "text": "Rode", "correct": true },
+          { "text": "Lidia", "correct": false },
+          { "text": "Cloé", "correct": false },
+          { "text": "Susana", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el padre de los apóstoles Jacobo y Juan?",
+        "answers": [
+          { "text": "Zebedeo", "correct": true },
+          { "text": "Alfeo", "correct": false },
+          { "text": "Jonas", "correct": false },
+          { "text": "Cleofas", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿En qué ciudad estaban los creyentes a los que se les llamó 'cristianos' por primera vez?",
+        "answers": [
+          { "text": "Antioquía", "correct": true },
+          { "text": "Jerusalén", "correct": false },
+          { "text": "Damasco", "correct": false },
+          { "text": "Roma", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el paralítico que Pedro sanó en Lida y que llevaba 8 años en cama?",
+        "answers": [
+          { "text": "Eneas", "correct": true },
+          { "text": "Tabita", "correct": false },
+          { "text": "Simón", "correct": false },
+          { "text": "Cornelio", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué objeto hizo flotar Eliseo en el agua?",
+        "answers": [
+          { "text": "Un hacha ", "correct": true },
+          { "text": "Una piedra", "correct": false },
+          { "text": "Un manto", "correct": false },
+          { "text": "Una vasija", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién escondió a cien profetas de Jehová en cuevas para salvarlos de Jezabel?",
+        "answers": [
+          { "text": "Abdías", "correct": true },
+          { "text": "Elías", "correct": false },
+          { "text": "Eliseo", "correct": false },
+          { "text": "Micaías", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Cuál era el nombre del marido de Abigail, descrito como un hombre duro y de malas obras?",
+        "answers": [
+          { "text": "Nabal", "correct": true },
+          { "text": "Caleb", "correct": false },
+          { "text": "Doeg", "correct": false },
+          { "text": "Simei", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién mató a ochenta y cinco sacerdotes de Jehová por orden de Saúl?",
+        "answers": [
+          { "text": "Doeg el edomita", "correct": true },
+          { "text": "Abner", "correct": false },
+          { "text": "Joab", "correct": false },
+          { "text": "Amasa", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué hijo de Saúl fue proclamado rey por Abner tras la muerte de Saúl?",
+        "answers": [
+          { "text": "Is-boset", "correct": true },
+          { "text": "Mefiboset", "correct": false },
+          { "text": "Armoni", "correct": false },
+          { "text": "Malquisúa", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién se ahorcó cuando vio que su consejo no fue seguido por Absalón?",
+        "answers": [
+          { "text": "Ahitofel", "correct": true },
+          { "text": "Husai", "correct": false },
+          { "text": "Siba", "correct": false },
+          { "text": "Simei", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué nombre le pusieron al niño nacido cuando el arca fue capturada y murió Elí?",
+        "answers": [
+          { "text": "Icabod", "correct": true },
+          { "text": "Samuel", "correct": false },
+          { "text": "Ebenezer", "correct": false },
+          { "text": "Gersón", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué ídolo filisteo cayó postrado en tierra, ante el Arca del Pacto?",
+        "answers": [
+          { "text": "Dagón", "correct": true },
+          { "text": "Baal", "correct": false },
+          { "text": "Astarot", "correct": false },
+          { "text": "Moloc", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué rey agagueo fue despedazado por Samuel delante de Jehová?",
+        "answers": [
+          { "text": "Agag", "correct": true },
+          { "text": "Sihón", "correct": false },
+          { "text": "Og", "correct": false },
+          { "text": "Balac", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el gobernador romano de Acaya que se negó a juzgar a Pablo?",
+        "answers": [
+          { "text": "Galión", "correct": true },
+          { "text": "Festo", "correct": false },
+          { "text": "Félix", "correct": false },
+          { "text": "Lisias", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién era el 'calderero' que Pablo menciona que le causó muchos males?",
+        "answers": [
+          { "text": "Alejandro", "correct": true },
+          { "text": "Himeneo", "correct": false },
+          { "text": "Fileto", "correct": false },
+          { "text": "Demas", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué compañero de Pablo lo abandonó 'amando este mundo'?",
+        "answers": [
+          { "text": "Demas", "correct": true },
+          { "text": "Crescente", "correct": false },
+          { "text": "Tito", "correct": false },
+          { "text": "Lucas", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué hombre principal de la isla de Malta hospedó a Pablo tras el naufragio?",
+        "answers": [
+          { "text": "Publio", "correct": true },
+          { "text": "Julio", "correct": false },
+          { "text": "Lisias", "correct": false },
+          { "text": "Sergio", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué ángel luchó contra el diablo por el cuerpo de Moisés según Judas?",
+        "answers": [
+          { "text": "Miguel", "correct": true },
+          { "text": "Gabriel", "correct": false },
+          { "text": "Rafael", "correct": false },
+          { "text": "Uriel", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el testigo fiel que fue muerto en Pérgamo, mencionado en Apocalipsis?",
+        "answers": [
+          { "text": "Antipas", "correct": true },
+          { "text": "Policarpo", "correct": false },
+          { "text": "Esteban", "correct": false },
+          { "text": "Ignacio", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Cuál es el nombre en hebreo del ángel del abismo?",
+        "answers": [
+          { "text": "Abadón", "correct": true },
+          { "text": "Apolión", "correct": false },
+          { "text": "Beelzebú", "correct": false },
+          { "text": "Belial", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué rey quemó el rollo escrito por Jeremías en el brasero?",
+        "answers": [
+          { "text": "Joacim", "correct": true },
+          { "text": "Sedequías", "correct": false },
+          { "text": "Josías", "correct": false },
+          { "text": "Joacaz", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el sumo sacerdote que sucedió a Aarón?",
+        "answers": [
+          { "text": "Eleazar", "correct": true },
+          { "text": "Itamar", "correct": false },
+          { "text": "Finees", "correct": false },
+          { "text": "Nadab", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿En qué valle derrotó David a Goliat?",
+        "answers": [
+          { "text": "Valle de Ela", "correct": true },
+          { "text": "Valle de Jezreel", "correct": false },
+          { "text": "Valle de Acor", "correct": false },
+          { "text": "Valle de Sidim", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué nombre puso Moisés al altar después de derrotar a Amalec?",
+        "answers": [
+          { "text": "Jehová-nisi", "correct": true },
+          { "text": "Jehová-jireh", "correct": false },
+          { "text": "Jehová-shalom", "correct": false },
+          { "text": "Betel", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Quién fue el rey de Moab que era muy grueso y fue asesinado por Aod?",
+        "answers": [
+          { "text": "Eglón", "correct": true },
+          { "text": "Balac", "correct": false },
+          { "text": "Sihón", "correct": false },
+          { "text": "Og", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿Qué juez hizo un voto imprudente que afectó a su hija?",
+        "answers": [
+          { "text": "Jefté", "correct": true },
+          { "text": "Gedeón", "correct": false },
+          { "text": "Sansón", "correct": false },
+          { "text": "Jair", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿En que lugar les dijeron, dioses bajo la semejanza de hombres han descendido a nosotros?",
+        "answers": [
+          { "text": "Listra", "correct": true },
+          { "text": "Iconio", "correct": false },
+          { "text": "Derbe", "correct": false },
+          { "text": "Antioquia", "correct": false }
+        ]
+      },
+      {
+        "category": "Difícil",
+        "question": "¿A quienes llamaron Júpiter y Mercurio?",
+        "answers": [
+          { "text": "Pablo y Bernabe", "correct": true },
+          { "text": "Pablo y Silas", "correct": false },
+          { "text": "Pedro y Juan", "correct": false },
+          { "text": "Bernabe y Felipe", "correct": false }
+        ]
+      }          
 ];
 

@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trivia Bíblica Multijugador</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* Prevenir selección de texto en toda la página */
         * {
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -19,7 +16,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Estilos comunes */
         #categoriaSeleccion {
             position: relative;
             overflow: hidden;
@@ -45,16 +41,11 @@
             transition: transform 0.3s ease;
             transform-origin: center;
         }
-        
-        #btnEmpezar {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
 
-        /* Cronómetro circular */
         .cronometro-container {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto;
         }
 
@@ -65,13 +56,13 @@
         .cronometro-bg {
             fill: none;
             stroke: #1f2937;
-            stroke-width: 8;
+            stroke-width: 10;
         }
 
         .cronometro-progress {
             fill: none;
             stroke: #3b82f6;
-            stroke-width: 8;
+            stroke-width: 10;
             stroke-linecap: round;
             transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease;
         }
@@ -89,12 +80,11 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 32px;
+            font-size: 48px;
             font-weight: bold;
             color: white;
         }
 
-        /* Estilos para respuestas */
         .respuesta-btn {
             transition: all 0.2s ease;
             touch-action: manipulation;
@@ -115,8 +105,8 @@
             position: absolute;
             top: -8px;
             left: -8px;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background-color: rgba(59, 130, 246, 0.9);
             color: white;
             border-radius: 50%;
@@ -124,7 +114,7 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             border: 2px solid white;
         }
         
@@ -138,8 +128,8 @@
             position: absolute;
             bottom: -8px;
             right: -8px;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background-color: rgba(220, 38, 38, 0.9);
             color: white;
             border-radius: 50%;
@@ -147,22 +137,22 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             border: 2px solid white;
         }
         
         .seleccion-ambos {
             position: relative;
-            background: rgba(59, 130, 246, 0.2);
-            border: 2px solid rgba(59, 130, 246, 1);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 50%, rgba(220, 38, 38, 0.3) 50%);
+            border: 2px solid rgba(147, 51, 234, 1);
         }
         .seleccion-ambos::before {
             content: "1";
             position: absolute;
             top: -8px;
             left: -8px;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background-color: rgba(59, 130, 246, 0.9);
             color: white;
             border-radius: 50%;
@@ -170,7 +160,7 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             border: 2px solid white;
         }
         .seleccion-ambos::after {
@@ -178,8 +168,8 @@
             position: absolute;
             bottom: -8px;
             right: -8px;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background-color: rgba(220, 38, 38, 0.9);
             color: white;
             border-radius: 50%;
@@ -187,11 +177,10 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             border: 2px solid white;
         }
         
-        /* Estilo para respuesta correcta */
         .respuesta-correcta {
             background-color: rgba(34, 197, 94, 0.5) !important;
             border: 2px solid rgba(34, 197, 94, 1) !important;
@@ -204,7 +193,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Pantalla de lobby */
         .codigo-sala {
             font-family: 'Courier New', monospace;
             font-size: 48px;
@@ -221,7 +209,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Estilos para resumen final */
         .trofeo-ganador {
             font-size: 80px;
             animation: bounce 2s infinite;
@@ -242,7 +229,6 @@
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
         }
 
-        /* Loader */
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3b82f6;
@@ -256,13 +242,90 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        .rol-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .rol-card {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 15px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .rol-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .rol-card.admin {
+            border-color: #fbbf24;
+        }
+
+        .rol-card.jugador {
+            border-color: #3b82f6;
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-4">
     
-    <!-- Pantalla de selección de categoría -->
-    <div id="categoriaSeleccion" class="text-center w-full max-w-5xl">
-        <h1 class="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-yellow-400">TRIVIA BÍBLICA MULTIJUGADOR</h1>
+    <!-- Pantalla de selección de ROL -->
+    <div id="pantallaRol" class="text-center w-full max-w-4xl">
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-yellow-400">TRIVIA BÍBLICA MULTIJUGADOR</h1>
+        <p class="text-gray-400 mb-8">Selecciona tu rol para comenzar</p>
+        
+        <div class="rol-selector">
+            <div class="rol-card admin" id="btnRolAdmin">
+                <div class="text-6xl mb-4">👑</div>
+                <h3 class="text-2xl font-bold text-yellow-400 mb-2">ADMINISTRADOR</h3>
+                <p class="text-gray-300 text-sm mb-4">Crea la sala y controla el juego</p>
+                <ul class="text-left text-sm text-gray-400 space-y-2">
+                    <li>✓ Crea y gestiona la sala</li>
+                    <li>✓ Ve las respuestas de ambos jugadores</li>
+                    <li>✓ Controla cuándo pasar a la siguiente pregunta</li>
+                    <li>✓ Escucha todos los sonidos del juego</li>
+                </ul>
+            </div>
+
+            <div class="rol-card jugador" id="btnRolJugador">
+                <div class="text-6xl mb-4">🎮</div>
+                <h3 class="text-2xl font-bold text-blue-400 mb-2">JUGADOR</h3>
+                <p class="text-gray-300 text-sm mb-4">Únete a una sala existente</p>
+                <ul class="text-left text-sm text-gray-400 space-y-2">
+                    <li>✓ Ingresa el código de la sala</li>
+                    <li>✓ Compite en tiempo real</li>
+                    <li>✓ Responde las preguntas</li>
+                    <li>✓ Ve los resultados finales</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de selección de categoría (SOLO ADMIN) -->
+    <div id="categoriaSeleccion" class="hidden text-center w-full max-w-5xl">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-yellow-400">
+            TRIVIA BÍBLICA 
+            <span class="admin-badge">ADMIN</span>
+        </h1>
+        <p class="text-gray-400 mb-8">Selecciona la categoría del juego</p>
+        
         <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
             <div class="categoria-card w-full md:w-64 p-4 md:p-6 bg-gradient-to-br from-blue-900 to-gray-900 cursor-pointer" data-categoria="Fácil">
                 <img src="assets/sanson.png" alt="Sansón" class="w-32 h-32 md:w-40 md:h-40 mx-auto categoria-img">
@@ -283,24 +346,49 @@
             </div>
         </div>
         
-        <button id="btnEmpezar" class="hidden fixed bottom-8 right-8 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-lg font-bold shadow-lg">
-            CREAR SALA
+        <button id="btnCrearSala" class="hidden mt-8 px-8 py-4 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg text-xl font-bold shadow-lg">
+            👑 CREAR SALA
+        </button>
+    </div>
+
+    <!-- Pantalla para unirse como JUGADOR -->
+    <div id="pantallaUnirse" class="hidden text-center w-full max-w-2xl">
+        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-blue-400">UNIRSE AL JUEGO</h1>
+        
+        <div class="bg-gray-900 p-8 rounded-2xl">
+            <p class="text-gray-400 mb-6">Ingresa el código de la sala proporcionado por el administrador</p>
+            
+            <input type="text" id="inputCodigoSala" 
+                   class="w-full px-6 py-4 text-center text-3xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg mb-6 uppercase tracking-widest"
+                   placeholder="ABC123"
+                   maxlength="6">
+            
+            <button id="btnUnirse" class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition">
+                🎮 UNIRSE A LA SALA
+            </button>
+        </div>
+
+        <button id="btnVolverRol" class="mt-6 px-6 py-3 bg-gray-700 rounded-lg font-bold hover:bg-gray-600 transition">
+            ← Volver
         </button>
     </div>
 
     <!-- Pantalla de Lobby/Sala de Espera -->
     <div id="pantallaLobby" class="hidden w-full max-w-3xl text-center">
-        <h1 class="text-3xl md:text-4xl font-bold mb-8 text-yellow-400">SALA DE ESPERA</h1>
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-yellow-400">
+            SALA DE ESPERA
+            <span id="adminBadgeLobby" class="admin-badge hidden">ADMIN</span>
+        </h1>
         
         <div class="bg-gray-900 p-8 rounded-2xl mb-8">
             <p class="text-gray-400 mb-4">Código de Sala</p>
             <div class="codigo-sala text-blue-400 mb-6" id="codigoSala">------</div>
-            <p class="text-sm text-gray-500">Comparte este código con tu oponente</p>
+            <p class="text-sm text-gray-500">Comparte este código con los jugadores</p>
         </div>
 
         <div class="grid grid-cols-2 gap-6 mb-8">
-            <div class="bg-blue-900 p-6 rounded-xl jugador-conectado">
-                <div class="text-6xl mb-4">👤</div>
+            <div class="bg-blue-900 p-6 rounded-xl" id="cardJugador1">
+                <div class="text-6xl mb-4">❓</div>
                 <p class="text-xl font-bold text-blue-300">Jugador 1</p>
                 <p class="text-sm text-gray-400" id="nombreJ1">Esperando...</p>
             </div>
@@ -316,7 +404,11 @@
             <div class="loader"></div>
         </div>
 
-        <p class="text-gray-400 mb-8">Esperando que se una el Jugador 2...</p>
+        <p class="text-gray-400 mb-8" id="textoEspera">Esperando que se unan los jugadores...</p>
+
+        <button id="btnIniciarJuego" class="hidden px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition mb-4">
+            🚀 INICIAR JUEGO
+        </button>
 
         <button id="btnCancelarSala" class="px-6 py-3 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition">
             Cancelar y Volver
@@ -324,34 +416,39 @@
     </div>
 
     <!-- Pantalla de juego -->
-    <div id="pantallaJuego" class="hidden w-full max-w-3xl text-center relative min-h-[70vh]">
+    <div id="pantallaJuego" class="hidden w-full max-w-4xl text-center relative">
         <div class="absolute top-4 right-4 bg-gray-800 px-3 py-1 rounded-lg">
             <span id="contadorPreguntas">Pregunta 1/15</span>
         </div>
 
+        <!-- Badge de Admin en juego -->
+        <div id="adminBadgeJuego" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2">
+            <span class="admin-badge">MODO ADMINISTRADOR</span>
+        </div>
+
         <!-- Cronómetro circular -->
-        <div class="cronometro-container mb-6">
-            <svg class="cronometro-circle" width="100" height="100">
-                <circle class="cronometro-bg" cx="50" cy="50" r="42"></circle>
-                <circle class="cronometro-progress" cx="50" cy="50" r="42" 
-                        stroke-dasharray="264" stroke-dashoffset="0" id="cronometroCircle"></circle>
+        <div class="cronometro-container mb-6 mt-16">
+            <svg class="cronometro-circle" width="120" height="120">
+                <circle class="cronometro-bg" cx="60" cy="60" r="50"></circle>
+                <circle class="cronometro-progress" cx="60" cy="60" r="50" 
+                        stroke-dasharray="314" stroke-dashoffset="0" id="cronometroCircle"></circle>
             </svg>
             <div class="cronometro-text" id="cronometroTexto">10</div>
         </div>
 
         <!-- Marcadores de puntuación -->
-        <div class="absolute top-4 left-4 flex gap-4">
-            <div class="bg-blue-900 px-4 py-2 rounded-lg">
+        <div class="flex justify-center gap-4 mb-6">
+            <div class="bg-blue-900 px-6 py-3 rounded-lg">
                 <p class="text-xs text-blue-300">Jugador 1</p>
-                <p class="text-2xl font-bold" id="puntosJ1">0</p>
+                <p class="text-3xl font-bold" id="puntosJ1">0</p>
             </div>
-            <div class="bg-red-900 px-4 py-2 rounded-lg">
+            <div class="bg-red-900 px-6 py-3 rounded-lg">
                 <p class="text-xs text-red-300">Jugador 2</p>
-                <p class="text-2xl font-bold" id="puntosJ2">0</p>
+                <p class="text-3xl font-bold" id="puntosJ2">0</p>
             </div>
         </div>
         
-        <div class="mb-8 mt-4 px-4">
+        <div class="mb-8 px-4">
             <h2 id="preguntaTexto" class="text-2xl md:text-3xl font-bold mb-2"></h2>
         </div>
         
@@ -359,9 +456,16 @@
             <!-- Respuestas se generan aquí -->
         </div>
         
-        <div class="fixed bottom-4 left-0 right-0 px-6 flex justify-center">
-            <button id="btnSalirJuego" class="px-4 md:px-6 py-2 md:py-3 bg-red-600 rounded-lg font-bold">
-                Salir del Juego
+        <!-- Botones de control (SOLO ADMIN) -->
+        <div id="controlesAdmin" class="hidden fixed bottom-4 left-0 right-0 px-6 flex justify-center gap-4">
+            <button id="btnSiguientePregunta" class="hidden px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition">
+                ➡️ SIGUIENTE PREGUNTA
+            </button>
+        </div>
+
+        <div class="fixed bottom-4 left-4">
+            <button id="btnSalirJuego" class="px-4 py-2 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition">
+                Salir
             </button>
         </div>
     </div>
@@ -372,8 +476,7 @@
         <h1 class="text-4xl md:text-5xl font-bold mb-8 text-yellow-400" id="tituloGanador">¡JUGADOR 1 GANA!</h1>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <!-- Card Jugador 1 -->
-            <div id="cardJ1" class="puntuacion-card bg-gradient-to-br from-blue-900 to-gray-900 p-8 rounded-2xl">
+            <div id="cardResumenJ1" class="puntuacion-card bg-gradient-to-br from-blue-900 to-gray-900 p-8 rounded-2xl">
                 <div class="text-6xl mb-4">👤</div>
                 <h2 class="text-2xl font-bold text-blue-300 mb-4">JUGADOR 1</h2>
                 <div class="space-y-3">
@@ -392,8 +495,7 @@
                 </div>
             </div>
 
-            <!-- Card Jugador 2 -->
-            <div id="cardJ2" class="puntuacion-card bg-gradient-to-br from-red-900 to-gray-900 p-8 rounded-2xl">
+            <div id="cardResumenJ2" class="puntuacion-card bg-gradient-to-br from-red-900 to-gray-900 p-8 rounded-2xl">
                 <div class="text-6xl mb-4">👤</div>
                 <h2 class="text-2xl font-bold text-red-300 mb-4">JUGADOR 2</h2>
                 <div class="space-y-3">
@@ -420,16 +522,10 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="config.js"></script>
     <script src="preguntas.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
-        // ========================================
-        // INICIALIZACIÓN Y CONFIGURACIÓN
-        // ========================================
-        
         const { createClient } = supabase;
         const supabaseClient = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         
@@ -444,7 +540,6 @@
             enabled: false,
             
             init() {
-                // Habilitar audio tras primera interacción del usuario
                 document.addEventListener('click', () => {
                     this.enabled = true;
                 }, { once: true });
@@ -473,21 +568,21 @@
             }
         };
 
-        // Estado global del juego
+        // Estado global
         const gameState = {
+            rol: null, // 'admin' o 'jugador'
+            jugadorNumero: null, // 1 o 2 (solo para jugadores)
             categoriaSeleccionada: null,
             salaId: null,
-            jugadorNumero: null,
             channel: null,
             preguntasFiltradas: [],
             preguntaIndex: 0,
             tiempoRestante: 10,
             timerInterval: null,
             puntajes: { jugador1: 0, jugador2: 0 },
-            respuestas: { jugador1: 0, jugador2: 0 },
+            respuestas: { jugador1: null, jugador2: null },
             respuestasCorrectas: { jugador1: 0, jugador2: 0 },
-            jugadorListo: false,
-            oponenteListo: false,
+            jugadoresConectados: { jugador1: false, jugador2: false },
             MAX_PREGUNTAS: 15,
             TIEMPO_POR_PREGUNTA: 10,
             PUNTOS_POR_NIVEL: { 'Fácil': 10, 'Medio': 20, 'Difícil': 50 }
@@ -495,13 +590,21 @@
 
         // Elementos DOM
         const DOM = {
+            pantallaRol: document.getElementById('pantallaRol'),
             pantallaCategoria: document.getElementById('categoriaSeleccion'),
+            pantallaUnirse: document.getElementById('pantallaUnirse'),
             pantallaLobby: document.getElementById('pantallaLobby'),
             pantallaJuego: document.getElementById('pantallaJuego'),
             pantallaResumen: document.getElementById('pantallaResumen'),
+            btnRolAdmin: document.getElementById('btnRolAdmin'),
+            btnRolJugador: document.getElementById('btnRolJugador'),
             categorias: document.querySelectorAll('.categoria-card'),
-            btnEmpezar: document.getElementById('btnEmpezar'),
+            btnCrearSala: document.getElementById('btnCrearSala'),
+            inputCodigoSala: document.getElementById('inputCodigoSala'),
+            btnUnirse: document.getElementById('btnUnirse'),
+            btnVolverRol: document.getElementById('btnVolverRol'),
             codigoSala: document.getElementById('codigoSala'),
+            btnIniciarJuego: document.getElementById('btnIniciarJuego'),
             btnCancelarSala: document.getElementById('btnCancelarSala'),
             preguntaTexto: document.getElementById('preguntaTexto'),
             contenedorRespuestas: document.getElementById('contenedorRespuestas'),
@@ -510,158 +613,178 @@
             cronometroCircle: document.getElementById('cronometroCircle'),
             puntosJ1: document.getElementById('puntosJ1'),
             puntosJ2: document.getElementById('puntosJ2'),
+            btnSiguientePregunta: document.getElementById('btnSiguientePregunta'),
             btnSalirJuego: document.getElementById('btnSalirJuego'),
             btnVolverInicio: document.getElementById('btnVolverInicio'),
-            cardJugador2: document.getElementById('cardJugador2')
+            controlesAdmin: document.getElementById('controlesAdmin'),
+            adminBadgeJuego: document.getElementById('adminBadgeJuego'),
+            adminBadgeLobby: document.getElementById('adminBadgeLobby')
         };
 
-        // ========================================
-        // FUNCIONES DE SUPABASE Y MULTIJUGADOR
-        // ========================================
+        // ===== FUNCIONES DE NAVEGACIÓN =====
+        
+        function mostrarPantalla(pantalla) {
+            [DOM.pantallaRol, DOM.pantallaCategoria, DOM.pantallaUnirse, 
+             DOM.pantallaLobby, DOM.pantallaJuego, DOM.pantallaResumen].forEach(p => {
+                p.classList.add('hidden');
+            });
+            pantalla.classList.remove('hidden');
+        }
 
+        // ===== EVENTOS DE ROL =====
+        
+        DOM.btnRolAdmin.addEventListener('click', () => {
+            gameState.rol = 'admin';
+            mostrarPantalla(DOM.pantallaCategoria);
+        });
+
+        DOM.btnRolJugador.addEventListener('click', () => {
+            gameState.rol = 'jugador';
+            mostrarPantalla(DOM.pantallaUnirse);
+        });
+
+        DOM.btnVolverRol.addEventListener('click', () => {
+            mostrarPantalla(DOM.pantallaRol);
+        });
+
+        // ===== SELECCIÓN DE CATEGORÍA (ADMIN) =====
+        
+        DOM.categorias.forEach(categoria => {
+            categoria.addEventListener('click', (e) => {
+                e.stopPropagation();
+                DOM.categorias.forEach(c => c.classList.remove('selected'));
+                categoria.classList.add('selected');
+                gameState.categoriaSeleccionada = categoria.dataset.categoria;
+                DOM.btnCrearSala.classList.remove('hidden');
+            });
+        });
+
+        DOM.btnCrearSala.addEventListener('click', crearSala);
+
+        // ===== UNIRSE COMO JUGADOR =====
+        
+        DOM.inputCodigoSala.addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        DOM.btnUnirse.addEventListener('click', () => {
+            const codigo = DOM.inputCodigoSala.value.trim();
+            if (codigo.length === 6) {
+                unirseASala(codigo);
+            } else {
+                alert('Por favor ingresa un código válido de 6 caracteres');
+            }
+        });
+
+        // ===== FUNCIONES DE SUPABASE =====
+        
         function generarCodigoSala() {
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
 
         async function crearSala() {
             const codigo = generarCodigoSala();
-            
             gameState.salaId = codigo;
-            gameState.jugadorNumero = 1;
             
-            // Crear canal de Supabase
             gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
-                config: {
-                    broadcast: { self: true }
-                }
+                config: { broadcast: { self: true } }
             });
 
-            // Suscribirse a eventos
             gameState.channel
                 .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
-                    if (payload.jugador === 2) {
-                        DOM.cardJugador2.classList.add('jugador-conectado');
-                        document.getElementById('nombreJ2').textContent = 'Conectado ✓';
+                    const numJugador = payload.jugador;
+                    gameState.jugadoresConectados[`jugador${numJugador}`] = true;
+                    
+                    document.getElementById(`cardJugador${numJugador}`).classList.add('jugador-conectado');
+                    document.getElementById(`cardJugador${numJugador}`).querySelector('.text-6xl').textContent = '✓';
+                    document.getElementById(`nombreJ${numJugador}`).textContent = 'Conectado';
+                    
+                    if (gameState.jugadoresConectados.jugador1 && gameState.jugadoresConectados.jugador2) {
                         document.getElementById('loaderEspera').classList.add('hidden');
-                        
-                        // Ambos jugadores listos, iniciar juego en 3 segundos
-                        setTimeout(() => {
-                            iniciarJuegoMultijugador();
-                        }, 3000);
+                        document.getElementById('textoEspera').textContent = '¡Ambos jugadores conectados! El admin puede iniciar el juego.';
+                        DOM.btnIniciarJuego.classList.remove('hidden');
                     }
                 })
                 .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
-                    actualizarRespuestaOponente(payload);
+                    gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
+                    actualizarEstilosRespuestas();
                 })
-                .on('broadcast', { event: 'pregunta-completada' }, ({ payload }) => {
-                    actualizarPuntajesOponente(payload);
+                .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
+                    gameState.categoriaSeleccionada = payload.categoria;
+                    iniciarJuegoMultijugador();
                 })
-                .on('broadcast', { event: 'jugador-desconectado' }, () => {
-                    alert('Tu oponente se ha desconectado');
-                    volverAlInicio();
+                .on('broadcast', { event: 'siguiente-pregunta' }, () => {
+                    gameState.preguntaIndex++;
+                    mostrarPregunta();
                 })
-                .subscribe((status) => {
-                    if (status === 'SUBSCRIBED') {
-                        // Notificar que el jugador 1 está conectado
-                        gameState.channel.send({
-                            type: 'broadcast',
-                            event: 'jugador-conectado',
-                            payload: { jugador: 1 }
-                        });
-                    }
-                });
+                .on('broadcast', { event: 'fin-juego' }, () => {
+                    finalizarJuego();
+                })
+                .subscribe();
 
-            // Mostrar pantalla de lobby
-            DOM.pantallaCategoria.classList.add('hidden');
-            DOM.pantallaLobby.classList.remove('hidden');
+            mostrarPantalla(DOM.pantallaLobby);
             DOM.codigoSala.textContent = codigo;
-            document.getElementById('nombreJ1').textContent = 'Conectado ✓';
+            DOM.adminBadgeLobby.classList.remove('hidden');
         }
 
         async function unirseASala(codigo) {
             gameState.salaId = codigo;
-            gameState.jugadorNumero = 2;
+            
+            // Determinar número de jugador
+            const numJugador = !gameState.jugadoresConectados.jugador1 ? 1 : 2;
+            gameState.jugadorNumero = numJugador;
 
-            // Crear canal de Supabase
             gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
-                config: {
-                    broadcast: { self: true }
-                }
+                config: { broadcast: { self: true } }
             });
 
-            // Suscribirse a eventos
             gameState.channel
-                .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
-                    if (payload.jugador === 1) {
-                        document.getElementById('nombreJ1').textContent = 'Conectado ✓';
+                .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
+                    if (payload.jugador !== gameState.jugadorNumero) {
+                        gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
+                        actualizarEstilosRespuestas();
                     }
                 })
-                .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
-                    actualizarRespuestaOponente(payload);
-                })
-                .on('broadcast', { event: 'pregunta-completada' }, ({ payload }) => {
-                    actualizarPuntajesOponente(payload);
-                })
-                .on('broadcast', { event: 'iniciar-juego' }, () => {
+                .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
+                    gameState.categoriaSeleccionada = payload.categoria;
                     iniciarJuegoMultijugador();
                 })
-                .on('broadcast', { event: 'jugador-desconectado' }, () => {
-                    alert('Tu oponente se ha desconectado');
-                    volverAlInicio();
+                .on('broadcast', { event: 'siguiente-pregunta' }, () => {
+                    gameState.preguntaIndex++;
+                    mostrarPregunta();
+                })
+                .on('broadcast', { event: 'fin-juego' }, () => {
+                    finalizarJuego();
                 })
                 .subscribe((status) => {
                     if (status === 'SUBSCRIBED') {
-                        // Notificar que el jugador 2 está conectado
                         gameState.channel.send({
                             type: 'broadcast',
                             event: 'jugador-conectado',
-                            payload: { jugador: 2 }
+                            payload: { jugador: numJugador }
                         });
 
-                        // Mostrar pantalla de lobby
-                        DOM.pantallaCategoria.classList.add('hidden');
-                        DOM.pantallaLobby.classList.remove('hidden');
+                        mostrarPantalla(DOM.pantallaLobby);
                         DOM.codigoSala.textContent = codigo;
-                        DOM.cardJugador2.classList.add('jugador-conectado');
-                        document.getElementById('nombreJ2').textContent = 'Conectado ✓';
-                        document.getElementById('loaderEspera').classList.add('hidden');
-
-                        // Iniciar juego en 3 segundos
-                        setTimeout(() => {
-                            gameState.channel.send({
-                                type: 'broadcast',
-                                event: 'iniciar-juego',
-                                payload: {}
-                            });
-                        }, 3000);
+                        document.getElementById('textoEspera').textContent = 'Esperando que el administrador inicie el juego...';
+                        document.getElementById('loaderEspera').classList.remove('hidden');
                     }
                 });
         }
 
-        function actualizarRespuestaOponente(payload) {
-            const jugadorOponente = gameState.jugadorNumero === 1 ? 2 : 1;
-            if (payload.jugador === jugadorOponente) {
-                gameState.respuestas[`jugador${jugadorOponente}`] = payload.respuestaIndex;
-                actualizarEstilosRespuestas();
-            }
-        }
+        // ===== INICIAR JUEGO (ADMIN) =====
+        
+        DOM.btnIniciarJuego.addEventListener('click', () => {
+            gameState.channel.send({
+                type: 'broadcast',
+                event: 'iniciar-juego',
+                payload: { categoria: gameState.categoriaSeleccionada }
+            });
+        });
 
-        function actualizarPuntajesOponente(payload) {
-            const jugadorOponente = gameState.jugadorNumero === 1 ? 2 : 1;
-            if (payload.jugador === jugadorOponente) {
-                gameState.puntajes[`jugador${jugadorOponente}`] = payload.puntos;
-                gameState.respuestasCorrectas[`jugador${jugadorOponente}`] = payload.correctas;
-                
-                DOM[`puntosJ${jugadorOponente}`].textContent = payload.puntos;
-            }
-        }
-
-        // ========================================
-        // LÓGICA DEL JUEGO
-        // ========================================
-
+        // ===== LÓGICA DEL JUEGO =====
+        
         function iniciarJuegoMultijugador() {
-            // Filtrar y mezclar preguntas
             gameState.preguntasFiltradas = preguntas.filter(p => p.category === gameState.categoriaSeleccionada);
             
             for (let i = gameState.preguntasFiltradas.length - 1; i > 0; i--) {
@@ -671,24 +794,29 @@
             }
 
             gameState.preguntasFiltradas = gameState.preguntasFiltradas.slice(0, gameState.MAX_PREGUNTAS);
-            
-            // Reiniciar estado
             gameState.preguntaIndex = 0;
             gameState.puntajes = { jugador1: 0, jugador2: 0 };
             gameState.respuestasCorrectas = { jugador1: 0, jugador2: 0 };
-            DOM.puntosJ1.textContent = '0';
-            DOM.puntosJ2.textContent = '0';
             
-            // Mostrar pantalla de juego
-            DOM.pantallaLobby.classList.add('hidden');
-            DOM.pantallaJuego.classList.remove('hidden');
+            mostrarPantalla(DOM.pantallaJuego);
+            
+            if (gameState.rol === 'admin') {
+                DOM.controlesAdmin.classList.remove('hidden');
+                DOM.adminBadgeJuego.classList.remove('hidden');
+            }
             
             mostrarPregunta();
         }
 
         function mostrarPregunta() {
             if (gameState.preguntaIndex >= gameState.preguntasFiltradas.length) {
-                finalizarJuego();
+                if (gameState.rol === 'admin') {
+                    gameState.channel.send({
+                        type: 'broadcast',
+                        event: 'fin-juego',
+                        payload: {}
+                    });
+                }
                 return;
             }
 
@@ -699,14 +827,12 @@
             DOM.contadorPreguntas.textContent = `Pregunta ${gameState.preguntaIndex + 1}/${gameState.preguntasFiltradas.length}`;
             DOM.contenedorRespuestas.innerHTML = '';
             
-            // Mezclar respuestas
             const respuestasMezcladas = [...pregunta.answers];
             for (let i = respuestasMezcladas.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [respuestasMezcladas[i], respuestasMezcladas[j]] = [respuestasMezcladas[j], respuestasMezcladas[i]];
             }
             
-            // Crear botones de respuesta
             respuestasMezcladas.forEach((respuesta, i) => {
                 const boton = document.createElement('button');
                 boton.className = 'respuesta-btn p-4 bg-gray-800 rounded-lg text-lg mb-2 md:mb-0 hover:bg-gray-700 transition-all';
@@ -714,18 +840,20 @@
                 boton.dataset.index = i;
                 boton.dataset.correct = respuesta.correct;
                 
-                boton.addEventListener('click', () => seleccionarRespuesta(i));
+                if (gameState.rol === 'jugador') {
+                    boton.addEventListener('click', () => seleccionarRespuesta(i));
+                }
+                
                 DOM.contenedorRespuestas.appendChild(boton);
             });
             
+            DOM.btnSiguientePregunta.classList.add('hidden');
             iniciarCronometro();
         }
 
         function seleccionarRespuesta(index) {
-            const miJugador = `jugador${gameState.jugadorNumero}`;
-            gameState.respuestas[miJugador] = index;
+            gameState.respuestas[`jugador${gameState.jugadorNumero}`] = index;
             
-            // Enviar selección al oponente
             gameState.channel.send({
                 type: 'broadcast',
                 event: 'respuesta-seleccionada',
@@ -758,7 +886,10 @@
         function iniciarCronometro() {
             gameState.tiempoRestante = gameState.TIEMPO_POR_PREGUNTA;
             actualizarCronometroVisual();
-            audioSystem.loop('tick');
+            
+            if (gameState.rol === 'admin') {
+                audioSystem.loop('tick');
+            }
             
             gameState.timerInterval = setInterval(() => {
                 gameState.tiempoRestante--;
@@ -778,22 +909,26 @@
 
         function actualizarCronometroVisual() {
             DOM.cronometroTexto.textContent = gameState.tiempoRestante;
-            const circumference = 264;
+            const circumference = 314;
             const offset = circumference - (gameState.tiempoRestante / gameState.TIEMPO_POR_PREGUNTA) * circumference;
             DOM.cronometroCircle.style.strokeDashoffset = offset;
         }
 
         function detenerCronometro() {
             clearInterval(gameState.timerInterval);
-            audioSystem.stop('tick');
+            if (gameState.rol === 'admin') {
+                audioSystem.stop('tick');
+            }
             DOM.cronometroCircle.classList.remove('warning', 'danger');
         }
 
         function tiempoAgotado() {
             detenerCronometro();
-            audioSystem.play('timeout');
             
-            // Deshabilitar botones
+            if (gameState.rol === 'admin') {
+                audioSystem.play('timeout');
+            }
+            
             document.querySelectorAll('.respuesta-btn').forEach(btn => {
                 btn.disabled = true;
             });
@@ -816,39 +951,39 @@
             });
             
             // Calcular puntos
-            const miJugador = `jugador${gameState.jugadorNumero}`;
-            if (gameState.respuestas[miJugador] === respuestaCorrecta) {
-                const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category];
-                gameState.puntajes[miJugador] += puntos;
-                gameState.respuestasCorrectas[miJugador]++;
-                
-                DOM[`puntosJ${gameState.jugadorNumero}`].textContent = gameState.puntajes[miJugador];
-                audioSystem.play('correct');
-                
-                // Enviar puntaje actualizado
-                gameState.channel.send({
-                    type: 'broadcast',
-                    event: 'pregunta-completada',
-                    payload: {
-                        jugador: gameState.jugadorNumero,
-                        puntos: gameState.puntajes[miJugador],
-                        correctas: gameState.respuestasCorrectas[miJugador]
-                    }
-                });
-            } else {
-                audioSystem.play('wrong');
+            const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category];
+            
+            if (gameState.respuestas.jugador1 === respuestaCorrecta) {
+                gameState.puntajes.jugador1 += puntos;
+                gameState.respuestasCorrectas.jugador1++;
+                if (gameState.rol === 'admin') audioSystem.play('correct');
+            } else if (gameState.respuestas.jugador1 !== null) {
+                if (gameState.rol === 'admin') audioSystem.play('wrong');
             }
             
-            // Continuar a la siguiente pregunta después de 3 segundos
-            setTimeout(() => {
-                gameState.preguntaIndex++;
-                mostrarPregunta();
-            }, 3000);
+            if (gameState.respuestas.jugador2 === respuestaCorrecta) {
+                gameState.puntajes.jugador2 += puntos;
+                gameState.respuestasCorrectas.jugador2++;
+            }
+            
+            DOM.puntosJ1.textContent = gameState.puntajes.jugador1;
+            DOM.puntosJ2.textContent = gameState.puntajes.jugador2;
+            
+            if (gameState.rol === 'admin') {
+                DOM.btnSiguientePregunta.classList.remove('hidden');
+            }
         }
 
+        DOM.btnSiguientePregunta.addEventListener('click', () => {
+            gameState.channel.send({
+                type: 'broadcast',
+                event: 'siguiente-pregunta',
+                payload: {}
+            });
+        });
+
         function finalizarJuego() {
-            DOM.pantallaJuego.classList.add('hidden');
-            DOM.pantallaResumen.classList.remove('hidden');
+            mostrarPantalla(DOM.pantallaResumen);
             
             const totalPreguntas = gameState.preguntasFiltradas.length;
             const puntosJ1 = gameState.puntajes.jugador1;
@@ -866,8 +1001,8 @@
             document.getElementById('correctasJ2').textContent = correctasJ2;
             document.getElementById('precisionJ2').textContent = precisionJ2 + '%';
             
-            const cardJ1 = document.getElementById('cardJ1');
-            const cardJ2 = document.getElementById('cardJ2');
+            const cardJ1 = document.getElementById('cardResumenJ1');
+            const cardJ2 = document.getElementById('cardResumenJ2');
             const tituloGanador = document.getElementById('tituloGanador');
             
             cardJ1.classList.remove('ganador');
@@ -884,21 +1019,10 @@
                 cardJ1.classList.add('ganador');
                 cardJ2.classList.add('ganador');
             }
-            
-            // Desconectar del canal
-            if (gameState.channel) {
-                gameState.channel.unsubscribe();
-            }
         }
 
         function volverAlInicio() {
-            // Limpiar estado
             if (gameState.channel) {
-                gameState.channel.send({
-                    type: 'broadcast',
-                    event: 'jugador-desconectado',
-                    payload: {}
-                });
                 gameState.channel.unsubscribe();
             }
             
@@ -908,71 +1032,26 @@
             gameState.jugadorNumero = null;
             gameState.channel = null;
             gameState.preguntaIndex = 0;
+            gameState.rol = null;
             
-            DOM.pantallaLobby.classList.add('hidden');
-            DOM.pantallaJuego.classList.add('hidden');
-            DOM.pantallaResumen.classList.add('hidden');
-            DOM.pantallaCategoria.classList.remove('hidden');
+            mostrarPantalla(DOM.pantallaRol);
             
             DOM.categorias.forEach(c => c.classList.remove('selected'));
-            DOM.btnEmpezar.classList.add('hidden');
-            gameState.categoriaSeleccionada = null;
+            DOM.btnCrearSala.classList.add('hidden');
+            DOM.inputCodigoSala.value = '';
         }
 
-        // ========================================
-        // EVENTOS DE INTERFAZ
-        // ========================================
+        DOM.btnCancelarSala.addEventListener('click', volverAlInicio);
+        DOM.btnSalirJuego.addEventListener('click', () => {
+            if (confirm('¿Seguro que deseas salir del juego?')) {
+                volverAlInicio();
+            }
+        });
+        DOM.btnVolverInicio.addEventListener('click', volverAlInicio);
 
+        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             audioSystem.init();
-            
-            // Selección de categoría
-            DOM.categorias.forEach(categoria => {
-                categoria.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    DOM.categorias.forEach(c => c.classList.remove('selected'));
-                    categoria.classList.add('selected');
-                    gameState.categoriaSeleccionada = categoria.dataset.categoria;
-                    
-                    DOM.btnEmpezar.classList.remove('hidden');
-                    DOM.btnEmpezar.style.opacity = '0';
-                    DOM.btnEmpezar.style.transform = 'translateY(10px)';
-                    setTimeout(() => {
-                        DOM.btnEmpezar.style.opacity = '1';
-                        DOM.btnEmpezar.style.transform = 'translateY(0)';
-                    }, 10);
-                });
-            });
-            
-            // Crear sala
-            DOM.btnEmpezar.addEventListener('click', () => {
-                if (gameState.categoriaSeleccionada) {
-                    const accion = prompt('Escribe "CREAR" para crear una sala o ingresa el código de sala para unirte:');
-                    
-                    if (accion) {
-                        if (accion.toUpperCase() === 'CREAR') {
-                            crearSala();
-                        } else if (accion.length === 6) {
-                            unirseASala(accion.toUpperCase());
-                        } else {
-                            alert('Código inválido. Debe tener 6 caracteres.');
-                        }
-                    }
-                }
-            });
-            
-            // Cancelar sala
-            DOM.btnCancelarSala.addEventListener('click', volverAlInicio);
-            
-            // Salir del juego
-            DOM.btnSalirJuego.addEventListener('click', () => {
-                if (confirm('¿Seguro que deseas salir del juego?')) {
-                    volverAlInicio();
-                }
-            });
-            
-            // Volver al inicio desde resumen
-            DOM.btnVolverInicio.addEventListener('click', volverAlInicio);
         });
     </script>
 </body>
