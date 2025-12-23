@@ -16,6 +16,13 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        input {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
         #categoriaSeleccion {
             position: relative;
             overflow: hidden;
@@ -282,6 +289,27 @@
         .rol-card.jugador {
             border-color: #3b82f6;
         }
+
+        .nombre-jugador-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+        .nombre-jugador-badge.j1 {
+            background-color: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            border: 1px solid #3b82f6;
+        }
+
+        .nombre-jugador-badge.j2 {
+            background-color: rgba(220, 38, 38, 0.3);
+            color: #f87171;
+            border: 1px solid #dc2626;
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -356,14 +384,27 @@
         <h1 class="text-3xl md:text-4xl font-bold mb-8 text-blue-400">UNIRSE AL JUEGO</h1>
         
         <div class="bg-gray-900 p-8 rounded-2xl">
-            <p class="text-gray-400 mb-6">Ingresa el código de la sala proporcionado por el administrador</p>
+            <p class="text-gray-400 mb-6">Ingresa tus datos para unirte a la sala</p>
             
-            <input type="text" id="inputCodigoSala" 
-                   class="w-full px-6 py-4 text-center text-3xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg mb-6 uppercase tracking-widest"
-                   placeholder="ABC123"
-                   maxlength="6">
+            <!-- Campo de nombre -->
+            <div class="mb-6">
+                <label class="block text-left text-sm text-gray-400 mb-2">Tu nombre:</label>
+                <input type="text" id="inputNombreJugador" 
+                       class="w-full px-6 py-4 text-center text-xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg"
+                       placeholder="Ej: Juan Pérez"
+                       maxlength="20">
+            </div>
+
+            <!-- Campo de código de sala -->
+            <div class="mb-6">
+                <label class="block text-left text-sm text-gray-400 mb-2">Código de sala:</label>
+                <input type="text" id="inputCodigoSala" 
+                       class="w-full px-6 py-4 text-center text-3xl font-bold bg-gray-800 border-2 border-blue-500 rounded-lg uppercase tracking-widest"
+                       placeholder="ABC123"
+                       maxlength="6">
+            </div>
             
-            <button id="btnUnirse" class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition">
+            <button id="btnUnirse" class="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition mb-4">
                 🎮 UNIRSE A LA SALA
             </button>
         </div>
@@ -436,14 +477,14 @@
             <div class="cronometro-text" id="cronometroTexto">10</div>
         </div>
 
-        <!-- Marcadores de puntuación -->
+        <!-- Marcadores de puntuación con nombres -->
         <div class="flex justify-center gap-4 mb-6">
             <div class="bg-blue-900 px-6 py-3 rounded-lg">
-                <p class="text-xs text-blue-300">Jugador 1</p>
+                <p class="text-xs text-blue-300" id="labelJ1">Jugador 1</p>
                 <p class="text-3xl font-bold" id="puntosJ1">0</p>
             </div>
             <div class="bg-red-900 px-6 py-3 rounded-lg">
-                <p class="text-xs text-red-300">Jugador 2</p>
+                <p class="text-xs text-red-300" id="labelJ2">Jugador 2</p>
                 <p class="text-3xl font-bold" id="puntosJ2">0</p>
             </div>
         </div>
@@ -478,7 +519,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <div id="cardResumenJ1" class="puntuacion-card bg-gradient-to-br from-blue-900 to-gray-900 p-8 rounded-2xl">
                 <div class="text-6xl mb-4">👤</div>
-                <h2 class="text-2xl font-bold text-blue-300 mb-4">JUGADOR 1</h2>
+                <h2 class="text-2xl font-bold text-blue-300 mb-4" id="nombreResumenJ1">Jugador 1</h2>
                 <div class="space-y-3">
                     <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg">
                         <p class="text-sm text-gray-300">Puntos totales</p>
@@ -497,7 +538,7 @@
 
             <div id="cardResumenJ2" class="puntuacion-card bg-gradient-to-br from-red-900 to-gray-900 p-8 rounded-2xl">
                 <div class="text-6xl mb-4">👤</div>
-                <h2 class="text-2xl font-bold text-red-300 mb-4">JUGADOR 2</h2>
+                <h2 class="text-2xl font-bold text-red-300 mb-4" id="nombreResumenJ2">Jugador 2</h2>
                 <div class="space-y-3">
                     <div class="bg-red-800 bg-opacity-50 p-4 rounded-lg">
                         <p class="text-sm text-gray-300">Puntos totales</p>
@@ -570,8 +611,10 @@
 
         // Estado global
         const gameState = {
-            rol: null, // 'admin' o 'jugador'
-            jugadorNumero: null, // 1 o 2 (solo para jugadores)
+            rol: null,
+            jugadorNumero: null,
+            nombreJugador: null,
+            nombresJugadores: { jugador1: 'Jugador 1', jugador2: 'Jugador 2' },
             categoriaSeleccionada: null,
             salaId: null,
             channel: null,
@@ -600,6 +643,7 @@
             btnRolJugador: document.getElementById('btnRolJugador'),
             categorias: document.querySelectorAll('.categoria-card'),
             btnCrearSala: document.getElementById('btnCrearSala'),
+            inputNombreJugador: document.getElementById('inputNombreJugador'),
             inputCodigoSala: document.getElementById('inputCodigoSala'),
             btnUnirse: document.getElementById('btnUnirse'),
             btnVolverRol: document.getElementById('btnVolverRol'),
@@ -613,12 +657,16 @@
             cronometroCircle: document.getElementById('cronometroCircle'),
             puntosJ1: document.getElementById('puntosJ1'),
             puntosJ2: document.getElementById('puntosJ2'),
+            labelJ1: document.getElementById('labelJ1'),
+            labelJ2: document.getElementById('labelJ2'),
             btnSiguientePregunta: document.getElementById('btnSiguientePregunta'),
             btnSalirJuego: document.getElementById('btnSalirJuego'),
             btnVolverInicio: document.getElementById('btnVolverInicio'),
             controlesAdmin: document.getElementById('controlesAdmin'),
             adminBadgeJuego: document.getElementById('adminBadgeJuego'),
-            adminBadgeLobby: document.getElementById('adminBadgeLobby')
+            adminBadgeLobby: document.getElementById('adminBadgeLobby'),
+            nombreResumenJ1: document.getElementById('nombreResumenJ1'),
+            nombreResumenJ2: document.getElementById('nombreResumenJ2')
         };
 
         // ===== FUNCIONES DE NAVEGACIÓN =====
@@ -668,12 +716,21 @@
         });
 
         DOM.btnUnirse.addEventListener('click', () => {
+            const nombre = DOM.inputNombreJugador.value.trim();
             const codigo = DOM.inputCodigoSala.value.trim();
-            if (codigo.length === 6) {
-                unirseASala(codigo);
-            } else {
-                alert('Por favor ingresa un código válido de 6 caracteres');
+            
+            if (!nombre) {
+                alert('Por favor ingresa tu nombre');
+                return;
             }
+            
+            if (codigo.length !== 6) {
+                alert('Por favor ingresa un código válido de 6 caracteres');
+                return;
+            }
+            
+            gameState.nombreJugador = nombre;
+            unirseASala(codigo);
         });
 
         // ===== FUNCIONES DE SUPABASE =====
@@ -693,11 +750,14 @@
             gameState.channel
                 .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
                     const numJugador = payload.jugador;
+                    const nombre = payload.nombre;
+                    
                     gameState.jugadoresConectados[`jugador${numJugador}`] = true;
+                    gameState.nombresJugadores[`jugador${numJugador}`] = nombre;
                     
                     document.getElementById(`cardJugador${numJugador}`).classList.add('jugador-conectado');
                     document.getElementById(`cardJugador${numJugador}`).querySelector('.text-6xl').textContent = '✓';
-                    document.getElementById(`nombreJ${numJugador}`).textContent = 'Conectado';
+                    document.getElementById(`nombreJ${numJugador}`).textContent = nombre;
                     
                     if (gameState.jugadoresConectados.jugador1 && gameState.jugadoresConectados.jugador2) {
                         document.getElementById('loaderEspera').classList.add('hidden');
@@ -711,6 +771,7 @@
                 })
                 .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
                     gameState.categoriaSeleccionada = payload.categoria;
+                    gameState.nombresJugadores = payload.nombres;
                     iniciarJuegoMultijugador();
                 })
                 .on('broadcast', { event: 'siguiente-pregunta' }, () => {
@@ -730,7 +791,6 @@
         async function unirseASala(codigo) {
             gameState.salaId = codigo;
             
-            // Determinar número de jugador
             const numJugador = !gameState.jugadoresConectados.jugador1 ? 1 : 2;
             gameState.jugadorNumero = numJugador;
 
@@ -747,6 +807,7 @@
                 })
                 .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
                     gameState.categoriaSeleccionada = payload.categoria;
+                    gameState.nombresJugadores = payload.nombres;
                     iniciarJuegoMultijugador();
                 })
                 .on('broadcast', { event: 'siguiente-pregunta' }, () => {
@@ -761,7 +822,10 @@
                         gameState.channel.send({
                             type: 'broadcast',
                             event: 'jugador-conectado',
-                            payload: { jugador: numJugador }
+                            payload: { 
+                                jugador: numJugador,
+                                nombre: gameState.nombreJugador
+                            }
                         });
 
                         mostrarPantalla(DOM.pantallaLobby);
@@ -778,7 +842,10 @@
             gameState.channel.send({
                 type: 'broadcast',
                 event: 'iniciar-juego',
-                payload: { categoria: gameState.categoriaSeleccionada }
+                payload: { 
+                    categoria: gameState.categoriaSeleccionada,
+                    nombres: gameState.nombresJugadores
+                }
             });
         });
 
@@ -797,6 +864,10 @@
             gameState.preguntaIndex = 0;
             gameState.puntajes = { jugador1: 0, jugador2: 0 };
             gameState.respuestasCorrectas = { jugador1: 0, jugador2: 0 };
+            
+            // Actualizar nombres en la pantalla de juego
+            DOM.labelJ1.textContent = gameState.nombresJugadores.jugador1;
+            DOM.labelJ2.textContent = gameState.nombresJugadores.jugador2;
             
             mostrarPantalla(DOM.pantallaJuego);
             
@@ -950,7 +1021,6 @@
                 }
             });
             
-            // Calcular puntos
             const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category];
             
             if (gameState.respuestas.jugador1 === respuestaCorrecta) {
@@ -993,6 +1063,10 @@
             const precisionJ1 = Math.round((correctasJ1 / totalPreguntas) * 100);
             const precisionJ2 = Math.round((correctasJ2 / totalPreguntas) * 100);
             
+            // Actualizar nombres en resumen
+            DOM.nombreResumenJ1.textContent = gameState.nombresJugadores.jugador1;
+            DOM.nombreResumenJ2.textContent = gameState.nombresJugadores.jugador2;
+            
             document.getElementById('puntajeFinalJ1').textContent = puntosJ1;
             document.getElementById('correctasJ1').textContent = correctasJ1;
             document.getElementById('precisionJ1').textContent = precisionJ1 + '%';
@@ -1009,10 +1083,10 @@
             cardJ2.classList.remove('ganador');
             
             if (puntosJ1 > puntosJ2) {
-                tituloGanador.textContent = '🎉 ¡JUGADOR 1 GANA! 🎉';
+                tituloGanador.textContent = `🎉 ¡${gameState.nombresJugadores.jugador1.toUpperCase()} GANA! 🎉`;
                 cardJ1.classList.add('ganador');
             } else if (puntosJ2 > puntosJ1) {
-                tituloGanador.textContent = '🎉 ¡JUGADOR 2 GANA! 🎉';
+                tituloGanador.textContent = `🎉 ¡${gameState.nombresJugadores.jugador2.toUpperCase()} GANA! 🎉`;
                 cardJ2.classList.add('ganador');
             } else {
                 tituloGanador.textContent = '🤝 ¡EMPATE! 🤝';
@@ -1030,6 +1104,8 @@
             
             gameState.salaId = null;
             gameState.jugadorNumero = null;
+            gameState.nombreJugador = null;
+            gameState.nombresJugadores = { jugador1: 'Jugador 1', jugador2: 'Jugador 2' };
             gameState.channel = null;
             gameState.preguntaIndex = 0;
             gameState.rol = null;
@@ -1039,6 +1115,7 @@
             DOM.categorias.forEach(c => c.classList.remove('selected'));
             DOM.btnCrearSala.classList.add('hidden');
             DOM.inputCodigoSala.value = '';
+            DOM.inputNombreJugador.value = '';
         }
 
         DOM.btnCancelarSala.addEventListener('click', volverAlInicio);
@@ -1049,7 +1126,6 @@
         });
         DOM.btnVolverInicio.addEventListener('click', volverAlInicio);
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             audioSystem.init();
         });
