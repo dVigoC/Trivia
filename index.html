@@ -529,7 +529,7 @@
 
       <button
         id="btnIniciarJuego"
-        class="hidden px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xl font-bold shadow-lg hover:scale-105 transition mb-4"
+        class="hidden px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-lg font-bold shadow-lg hover:scale-105 transition mb-4"
       >
         INICIAR JUEGO
       </button>
@@ -985,8 +985,9 @@
         .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
           gameState.categoriaSeleccionada = payload.categoria;
           gameState.nombresJugadores = payload.nombres;
-          iniciarJuegoMultijugador();
+          iniciarJuegoMultijugador(payload.preguntas); // NUEVO: pasar las preguntas
         })
+
         .on('broadcast', { event: 'siguiente-pregunta' }, () => {
           gameState.preguntaIndex++;
           mostrarPregunta();
@@ -1030,8 +1031,9 @@
           }
 
           console.log('Mi número de jugador:', gameState.jugadorNumero);
-          iniciarJuegoMultijugador();
+          iniciarJuegoMultijugador(payload.preguntas); // NUEVO: pasar las preguntas
         })
+
         .on('broadcast', { event: 'siguiente-pregunta' }, () => {
           gameState.preguntaIndex++;
           mostrarPregunta();
@@ -1071,35 +1073,60 @@
     DOM.btnIniciarJuego.addEventListener('click', () => {
       console.log('Admin inicia juego con nombres:', gameState.nombresJugadores);
       
+      // NUEVO: El admin mezcla las preguntas AQUÍ
+      const preguntasFiltradas = preguntas.filter(
+        (p) => p.category === gameState.categoriaSeleccionada
+      );
+
+      // Mezclar preguntas
+      for (let i = preguntasFiltradas.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [preguntasFiltradas[i], preguntasFiltradas[j]] = [
+          preguntasFiltradas[j],
+          preguntasFiltradas[i]
+        ];
+      }
+
+      const preguntasParaEnviar = preguntasFiltradas.slice(0, gameState.MAXPREGUNTAS);
+      
       gameState.channel.send({
         type: 'broadcast',
         event: 'iniciar-juego',
         payload: {
           categoria: gameState.categoriaSeleccionada,
-          nombres: gameState.nombresJugadores
+          nombres: gameState.nombresJugadores,
+          preguntas: preguntasParaEnviar // NUEVO: enviar las preguntas mezcladas
         }
       });
     });
 
-    // Lógica del juego
-    function iniciarJuegoMultijugador() {
-      gameState.preguntasFiltradas = preguntas.filter(
-        (p) => p.category === gameState.categoriaSeleccionada
-      );
 
-      // Mezclar preguntas
-      for (let i = gameState.preguntasFiltradas.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [gameState.preguntasFiltradas[i], gameState.preguntasFiltradas[j]] = [
-          gameState.preguntasFiltradas[j],
-          gameState.preguntasFiltradas[i]
-        ];
+    // Lógica del juego
+    function iniciarJuegoMultijugador(preguntasRecibidas = null) {
+      // Si recibimos preguntas (jugadores), usarlas. Si no (admin), mezclar localmente
+      if (preguntasRecibidas) {
+        gameState.preguntasFiltradas = preguntasRecibidas;
+      } else {
+        // Solo el admin llega aquí
+        gameState.preguntasFiltradas = preguntas.filter(
+          (p) => p.category === gameState.categoriaSeleccionada
+        );
+
+        // Mezclar preguntas
+        for (let i = gameState.preguntasFiltradas.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [gameState.preguntasFiltradas[i], gameState.preguntasFiltradas[j]] = [
+            gameState.preguntasFiltradas[j],
+            gameState.preguntasFiltradas[i]
+          ];
+        }
+
+        gameState.preguntasFiltradas = gameState.preguntasFiltradas.slice(
+          0,
+          gameState.MAXPREGUNTAS
+        );
       }
 
-      gameState.preguntasFiltradas = gameState.preguntasFiltradas.slice(
-        0,
-        gameState.MAXPREGUNTAS
-      );
       gameState.preguntaIndex = 0;
       gameState.puntajes = { jugador1: 0, jugador2: 0 };
       gameState.respuestasCorrectas = { jugador1: 0, jugador2: 0 };
@@ -1117,6 +1144,7 @@
 
       mostrarPregunta();
     }
+
 
     function mostrarPregunta() {
       if (gameState.preguntaIndex >= gameState.preguntasFiltradas.length) {
