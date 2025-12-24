@@ -356,10 +356,10 @@
           Crea la sala y controla el juego
         </p>
         <ul class="text-left text-sm text-gray-400 space-y-2">
-          <li>Crea y gestiona la sala</li>
-          <li>Ve las respuestas de ambos jugadores</li>
-          <li>Controla cuándo pasar a la siguiente pregunta</li>
-          <li>Escucha todos los sonidos del juego</li>
+          <li>✓ Crea y gestiona la sala</li>
+          <li>✓ Ve las respuestas de ambos jugadores</li>
+          <li>✓ Controla cuándo pasar a la siguiente pregunta</li>
+          <li>✓ Escucha todos los sonidos del juego</li>
         </ul>
       </div>
 
@@ -370,10 +370,10 @@
           Únete a una sala existente
         </p>
         <ul class="text-left text-sm text-gray-400 space-y-2">
-          <li>Ingresa el código de la sala</li>
-          <li>Compite en tiempo real</li>
-          <li>Responde las preguntas</li>
-          <li>Ve los resultados finales</li>
+          <li>✓ Ingresa el código de la sala</li>
+          <li>✓ Compite en tiempo real</li>
+          <li>✓ Responde las preguntas</li>
+          <li>✓ Ve los resultados finales</li>
         </ul>
       </div>
     </div>
@@ -505,42 +505,42 @@
       <p class="text-sm text-gray-500">
         Comparte este código con los jugadores
       </p>
-
-      <div class="grid grid-cols-2 gap-6 mb-8">
-        <div class="bg-blue-900 p-6 rounded-xl" id="cardJugador1">
-          <div class="text-6xl mb-4">🎮</div>
-          <p class="text-xl font-bold text-blue-300">Jugador 1</p>
-          <p class="text-sm text-gray-400" id="nombreJ1">Esperando...</p>
-        </div>
-
-        <div class="bg-red-900 p-6 rounded-xl" id="cardJugador2">
-          <div class="text-6xl mb-4">🎮</div>
-          <p class="text-xl font-bold text-red-300">Jugador 2</p>
-          <p class="text-sm text-gray-400" id="nombreJ2">Esperando...</p>
-        </div>
-      </div>
-
-      <div id="loaderEspera" class="flex justify-center mb-6">
-        <div class="loader"></div>
-      </div>
-      <p class="text-gray-400 mb-8" id="textoEspera">
-        Esperando que se unan los jugadores...
-      </p>
-
-      <button
-        id="btnIniciarJuego"
-        class="hidden px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-lg font-bold shadow-lg hover:scale-105 transition mb-4"
-      >
-        INICIAR JUEGO
-      </button>
-
-      <button
-        id="btnCancelarSala"
-        class="px-6 py-3 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition"
-      >
-        Cancelar y Volver
-      </button>
     </div>
+
+    <div class="grid grid-cols-2 gap-6 mb-8">
+      <div class="bg-blue-900 p-6 rounded-xl" id="cardJugador1">
+        <div class="text-6xl mb-4">🎮</div>
+        <p class="text-xl font-bold text-blue-300">Jugador 1</p>
+        <p class="text-sm text-gray-400" id="nombreJ1">Esperando...</p>
+      </div>
+
+      <div class="bg-red-900 p-6 rounded-xl" id="cardJugador2">
+        <div class="text-6xl mb-4">🎮</div>
+        <p class="text-xl font-bold text-red-300">Jugador 2</p>
+        <p class="text-sm text-gray-400" id="nombreJ2">Esperando...</p>
+      </div>
+    </div>
+
+    <div id="loaderEspera" class="flex justify-center mb-6">
+      <div class="loader"></div>
+    </div>
+    <p class="text-gray-400 mb-8" id="textoEspera">
+      Esperando que se unan los jugadores...
+    </p>
+
+    <button
+      id="btnIniciarJuego"
+      class="hidden px-5 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-lg font-bold shadow-lg hover:scale-105 transition mb-4"
+    >
+      INICIAR JUEGO
+    </button>
+
+    <button
+      id="btnCancelarSala"
+      class="px-6 py-3 bg-red-600 rounded-lg font-bold hover:bg-red-700 transition"
+    >
+      Cancelar y Volver
+    </button>
   </div>
 
   <!-- Pantalla de juego -->
@@ -934,6 +934,7 @@
       return Math.random().toString(36).substring(2, 8).toUpperCase();
     }
 
+    // ✅ CORRECCIÓN 1: Agregar await channel.subscribe() en crearSala
     async function crearSala() {
       const codigo = generarCodigoSala();
       gameState.salaId = codigo;
@@ -982,27 +983,24 @@
           gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
           actualizarEstilosRespuestas();
         })
-        .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
-          gameState.categoriaSeleccionada = payload.categoria;
-          gameState.nombresJugadores = payload.nombres;
-          iniciarJuegoMultijugador(payload.preguntas);
-        })
-        .on('broadcast', { event: 'siguiente-pregunta' }, () => {
-          gameState.preguntaIndex++;
-          mostrarPregunta();
-        })
-        .on('broadcast', { event: 'fin-juego' }, () => {
-          finalizarJuego();
-        })
-        .subscribe((status) => {
-          console.log('Admin subscribe status:', status);
+        .on('broadcast', { event: 'sincronizar-tiempo' }, ({ payload }) => {
+          // ✅ CORRECCIÓN 3: Sincronizar tiempo desde el admin
+          gameState.tiempoRestante = payload.tiempo;
+          actualizarCronometroVisual();
         });
 
-      mostrarPantalla(DOM.pantallaLobby);
-      DOM.codigoSala.textContent = codigo;
-      DOM.adminBadgeLobby.classList.remove('hidden');
+      // ✅ CORRECCIÓN 1: Esperar a que el canal esté suscrito
+      const status = await gameState.channel.subscribe();
+      console.log('Admin subscribe status:', status);
+
+      if (status === 'SUBSCRIBED') {
+        mostrarPantalla(DOM.pantallaLobby);
+        DOM.codigoSala.textContent = codigo;
+        DOM.adminBadgeLobby.classList.remove('hidden');
+      }
     }
 
+    // ✅ CORRECCIÓN 1: Agregar await channel.subscribe() en unirseASala
     async function unirseASala(codigo) {
       gameState.salaId = codigo;
 
@@ -1012,7 +1010,8 @@
 
       gameState.channel
         .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
-          if (payload.jugador !== gameState.jugadorNumero) {
+          // ✅ CORRECCIÓN 5: Solo actualizar estilos si soy el admin
+          if (gameState.rol === 'admin') {
             gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
             actualizarEstilosRespuestas();
           }
@@ -1030,7 +1029,11 @@
           }
 
           console.log('Mi número de jugador:', gameState.jugadorNumero);
-          iniciarJuegoMultijugador(payload.preguntas);
+          
+          // ✅ CORRECCIÓN 2: Esperar un poco antes de iniciar el juego
+          setTimeout(() => {
+            iniciarJuegoMultijugador(payload.preguntas);
+          }, 500);
         })
         .on('broadcast', { event: 'siguiente-pregunta' }, () => {
           gameState.preguntaIndex++;
@@ -1043,31 +1046,40 @@
           alert('La sala ha sido cancelada por el administrador');
           volverAlInicio();
         })
-        .subscribe(async (status) => {
-          console.log('Jugador subscribe status:', status);
-          
-          if (status === 'SUBSCRIBED') {
-            console.log('Enviando jugador-conectado con nombre:', gameState.nombreJugador);
-            
-            await gameState.channel.send({
-              type: 'broadcast',
-              event: 'jugador-conectado',
-              payload: {
-                nombre: gameState.nombreJugador
-              }
-            });
+        .on('broadcast', { event: 'sincronizar-tiempo' }, ({ payload }) => {
+          // ✅ CORRECCIÓN 3: Sincronizar tiempo desde el admin
+          gameState.tiempoRestante = payload.tiempo;
+          actualizarCronometroVisual();
+        });
 
-            mostrarPantalla(DOM.pantallaLobby);
-            DOM.codigoSala.textContent = codigo;
-            document.getElementById('textoEspera').textContent =
-              'Esperando que el administrador inicie el juego...';
-            document.getElementById('loaderEspera').classList.remove('hidden');
+      // ✅ CORRECCIÓN 1: Esperar a que el canal esté suscrito
+      const status = await gameState.channel.subscribe();
+      console.log('Jugador subscribe status:', status);
+      
+      if (status === 'SUBSCRIBED') {
+        console.log('Enviando jugador-conectado con nombre:', gameState.nombreJugador);
+        
+        // Esperar un poco para asegurar que el admin también esté suscrito
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        await gameState.channel.send({
+          type: 'broadcast',
+          event: 'jugador-conectado',
+          payload: {
+            nombre: gameState.nombreJugador
           }
         });
+
+        mostrarPantalla(DOM.pantallaLobby);
+        DOM.codigoSala.textContent = codigo;
+        document.getElementById('textoEspera').textContent =
+          'Esperando que el administrador inicie el juego...';
+        document.getElementById('loaderEspera').classList.remove('hidden');
+      }
     }
 
     // Iniciar juego ADMIN
-    DOM.btnIniciarJuego.addEventListener('click', () => {
+    DOM.btnIniciarJuego.addEventListener('click', async () => {
       console.log('Admin inicia juego con nombres:', gameState.nombresJugadores);
       
       // Filtrar preguntas por categoría
@@ -1105,7 +1117,8 @@
         };
       });
       
-      gameState.channel.send({
+      // ✅ CORRECCIÓN 2: Enviar evento de inicio de juego
+      await gameState.channel.send({
         type: 'broadcast',
         event: 'iniciar-juego',
         payload: {
@@ -1114,6 +1127,11 @@
           preguntas: preguntasConRespuestasMezcladas
         }
       });
+
+      // Esperar un poco para asegurar que todos reciban el evento
+      setTimeout(() => {
+        iniciarJuegoMultijugador(preguntasConRespuestasMezcladas);
+      }, 300);
     });
 
     // Lógica del juego
@@ -1210,6 +1228,7 @@
     }
 
     function seleccionarRespuesta(index) {
+      // ✅ CORRECCIÓN 5: Jugador solo guarda su propia respuesta
       gameState.respuestas[`jugador${gameState.jugadorNumero}`] = index;
 
       gameState.channel.send({
@@ -1221,10 +1240,17 @@
         }
       });
 
-      actualizarEstilosRespuestas();
+      // ✅ CORRECCIÓN 5: Jugador NO actualiza estilos de otros
+      // Solo deshabilitar el botón seleccionado
+      document.querySelectorAll('.respuesta-btn').forEach((btn) => {
+        btn.disabled = true;
+      });
     }
 
     function actualizarEstilosRespuestas() {
+      // ✅ CORRECCIÓN 5: Solo el admin puede ver las selecciones de todos
+      if (gameState.rol !== 'admin') return;
+
       document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
         btn.classList.remove('seleccion-jugador1', 'seleccion-jugador2', 'seleccion-ambos');
         
@@ -1241,53 +1267,75 @@
       });
     }
 
+    // ✅ CORRECCIÓN 3: Cronómetro sincronizado desde el admin
     function iniciarCronometro() {
+      // ✅ CORRECCIÓN 3: Limpiar timer anterior antes de crear uno nuevo
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+        gameState.timerInterval = null;
+      }
+
       gameState.tiempoRestante = gameState.TIEMPO_POR_PREGUNTA;
       actualizarCronometroVisual();
 
+      // ✅ CORRECCIÓN 4: Solo admin reproduce sonido tic-tac
       if (gameState.rol === 'admin') {
         audioSystem.loop('tick');
       }
 
-      gameState.timerInterval = setInterval(() => {
-        gameState.tiempoRestante--;
-        actualizarCronometroVisual();
+      // Solo el admin maneja el timer
+      if (gameState.rol === 'admin') {
+        gameState.timerInterval = setInterval(() => {
+          gameState.tiempoRestante--;
+          actualizarCronometroVisual();
 
-        if (gameState.tiempoRestante === 3) {
-          DOM.cronometroCircle.classList.add('danger');
-        } else if (gameState.tiempoRestante === 5) {
-          DOM.cronometroCircle.classList.add('warning');
-        }
+          // ✅ CORRECCIÓN 3: Admin envía tiempo a todos
+          gameState.channel.send({
+            type: 'broadcast',
+            event: 'sincronizar-tiempo',
+            payload: {
+              tiempo: gameState.tiempoRestante
+            }
+          });
 
-        if (gameState.tiempoRestante <= 0) {
-          tiempoAgotado();
-        }
-      }, 1000);
+          if (gameState.tiempoRestante === 3) {
+            DOM.cronometroCircle.classList.add('danger');
+          } else if (gameState.tiempoRestante === 5) {
+            DOM.cronometroCircle.classList.add('warning');
+          }
+
+          if (gameState.tiempoRestante <= 0) {
+            tiempoAgotado();
+          }
+        }, 1000);
+      }
     }
 
     function actualizarCronometroVisual() {
-      DOM.cronometroTexto.textContent = gameState.tiempoRestante;
+      DOM.cronometroTexto.textContent = Math.max(0, gameState.tiempoRestante);
       const circumference = 314;
       const offset =
         circumference -
-        (gameState.tiempoRestante / gameState.TIEMPO_POR_PREGUNTA) * circumference;
+        (Math.max(0, gameState.tiempoRestante) / gameState.TIEMPO_POR_PREGUNTA) * circumference;
       DOM.cronometroCircle.style.strokeDashoffset = offset;
     }
 
     function detenerCronometro() {
-      clearInterval(gameState.timerInterval);
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+        gameState.timerInterval = null;
+      }
+      
+      // ✅ CORRECCIÓN 4: Solo admin detiene sonido tic-tac
       if (gameState.rol === 'admin') {
         audioSystem.stop('tick');
       }
+      
       DOM.cronometroCircle.classList.remove('warning', 'danger');
     }
 
     function tiempoAgotado() {
       detenerCronometro();
-
-      if (gameState.rol === 'admin') {
-        audioSystem.play('timeout');
-      }
 
       document.querySelectorAll('.respuesta-btn').forEach((btn) => {
         btn.disabled = true;
@@ -1312,21 +1360,24 @@
 
       const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category] || 10;
 
+      // Calcular puntajes
       if (gameState.respuestas.jugador1 === respuestaCorrecta) {
         gameState.puntajes.jugador1 += puntos;
         gameState.respuestasCorrectas.jugador1++;
-        if (gameState.rol === 'admin') {
-          audioSystem.play('correct');
-        }
-      } else if (gameState.respuestas.jugador1 !== null) {
-        if (gameState.rol === 'admin') {
-          audioSystem.play('wrong');
-        }
       }
 
       if (gameState.respuestas.jugador2 === respuestaCorrecta) {
         gameState.puntajes.jugador2 += puntos;
         gameState.respuestasCorrectas.jugador2++;
+      }
+
+      // ✅ CORRECCIÓN 4: Jugadores reproducen sus propios sonidos
+      if (gameState.rol === 'jugador') {
+        if (gameState.respuestas[`jugador${gameState.jugadorNumero}`] === respuestaCorrecta) {
+          audioSystem.play('correct');
+        } else if (gameState.respuestas[`jugador${gameState.jugadorNumero}`] !== null) {
+          audioSystem.play('wrong');
+        }
       }
 
       DOM.puntosJ1.textContent = gameState.puntajes.jugador1;
@@ -1346,6 +1397,7 @@
     });
 
     function finalizarJuego() {
+      detenerCronometro();
       mostrarPantalla(DOM.pantallaResumen);
 
       const totalPreguntas = gameState.preguntasFiltradas.length;
@@ -1396,6 +1448,12 @@
         gameState.channel.unsubscribe();
       }
       detenerCronometro();
+      
+      // Detener todos los sonidos
+      audioSystem.stop('tick');
+      audioSystem.stop('timeout');
+      audioSystem.stop('correct');
+      audioSystem.stop('wrong');
 
       // Resetear todo
       gameState.salaId = null;
