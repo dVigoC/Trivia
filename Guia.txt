@@ -20,7 +20,7 @@ git init
 git add .
 
 # Crea tu primer commit
-git commit -m "actualizacion 9 del Proyecto Trivia"
+git commit -m "actualizacion 10 del Proyecto Trivia"
 
 # Cambia el nombre de la rama principal a 'main' (estándar de GitHub)
 git branch -M main

@@ -24,7 +24,8 @@
 
     .categoriaSeleccion {
       position: relative;
-      overflow: hidden;
+      overflow: visible;
+      padding: 10px;
     }
 
     .categoria-card {
@@ -39,7 +40,7 @@
     .categoria-card.selected {
       transform: translateY(-3px) scale(1.01);
       box-shadow: 0 0 15px rgba(81, 203, 238, 0.6);
-      border: 2px solid rgba(81, 203, 238, 0.6);
+      border: 1px solid rgba(81, 203, 238, 0.6);
       z-index: 5;
     }
 
@@ -936,128 +937,152 @@
 
     // ✅ CORRECCIÓN 1: Agregar await channel.subscribe() en crearSala
     async function crearSala() {
-      const codigo = generarCodigoSala();
-      gameState.salaId = codigo;
+      try {
+        const codigo = generarCodigoSala();
+        gameState.salaId = codigo;
 
-      gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
-        config: { broadcast: { self: true } }
-      });
-
-      gameState.channel
-        .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
-          console.log('Admin recibió jugador-conectado:', payload);
-          
-          const { nombre } = payload;
-
-          // Asignar a la primera casilla libre
-          let numJugador = null;
-          if (!gameState.jugadoresConectados.jugador1) {
-            numJugador = 1;
-          } else if (!gameState.jugadoresConectados.jugador2) {
-            numJugador = 2;
-          } else {
-            console.log('Ya hay 2 jugadores, ignorando');
-            return;
-          }
-
-          // Marcar como conectado
-          gameState.jugadoresConectados[`jugador${numJugador}`] = true;
-          gameState.nombresJugadores[`jugador${numJugador}`] = nombre;
-
-          // Actualizar UI
-          const card = document.getElementById(`cardJugador${numJugador}`);
-          card.classList.add('jugador-conectado');
-          document.getElementById(`nombreJ${numJugador}`).textContent = nombre;
-
-          console.log(`Jugador ${numJugador} conectado: ${nombre}`);
-
-          // Verificar si ya están los 2
-          if (gameState.jugadoresConectados.jugador1 && gameState.jugadoresConectados.jugador2) {
-            document.getElementById('loaderEspera').classList.add('hidden');
-            document.getElementById('textoEspera').textContent =
-              'Ambos jugadores conectados! El admin puede iniciar el juego.';
-            DOM.btnIniciarJuego.classList.remove('hidden');
-          }
-        })
-        .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
-          gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
-          actualizarEstilosRespuestas();
-        })
-        .on('broadcast', { event: 'sincronizar-tiempo' }, ({ payload }) => {
-          // ✅ CORRECCIÓN 3: Sincronizar tiempo desde el admin
-          gameState.tiempoRestante = payload.tiempo;
-          actualizarCronometroVisual();
+        gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
+          config: { broadcast: { self: true } }
         });
 
-      // ✅ CORRECCIÓN 1: Esperar a que el canal esté suscrito
-      const status = await gameState.channel.subscribe();
-      console.log('Admin subscribe status:', status);
+        gameState.channel
+          .on('broadcast', { event: 'jugador-conectado' }, ({ payload }) => {
+            console.log('Admin recibió jugador-conectado:', payload);
+            
+            const { nombre } = payload;
 
-      if (status === 'SUBSCRIBED') {
+            // Asignar a la primera casilla libre
+            let numJugador = null;
+            if (!gameState.jugadoresConectados.jugador1) {
+              numJugador = 1;
+            } else if (!gameState.jugadoresConectados.jugador2) {
+              numJugador = 2;
+            } else {
+              console.log('Ya hay 2 jugadores, ignorando');
+              return;
+            }
+
+            // Marcar como conectado
+            gameState.jugadoresConectados[`jugador${numJugador}`] = true;
+            gameState.nombresJugadores[`jugador${numJugador}`] = nombre;
+
+            // Actualizar UI
+            const card = document.getElementById(`cardJugador${numJugador}`);
+            card.classList.add('jugador-conectado');
+            document.getElementById(`nombreJ${numJugador}`).textContent = nombre;
+
+            console.log(`Jugador ${numJugador} conectado: ${nombre}`);
+
+            // Verificar si ya están los 2
+            if (gameState.jugadoresConectados.jugador1 && gameState.jugadoresConectados.jugador2) {
+              document.getElementById('loaderEspera').classList.add('hidden');
+              document.getElementById('textoEspera').textContent =
+                'Ambos jugadores conectados! El admin puede iniciar el juego.';
+              DOM.btnIniciarJuego.classList.remove('hidden');
+            }
+          })
+          .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
+            gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
+            actualizarEstilosRespuestas();
+          })
+          .on('broadcast', { event: 'sincronizar-tiempo' }, ({ payload }) => {
+            gameState.tiempoRestante = payload.tiempo;
+            actualizarCronometroVisual();
+          })
+          .on('broadcast', { event: 'mostrar-respuesta-correcta' }, ({ payload }) => {
+            // Admin recibe su propio broadcast
+            const { respuestaCorrecta } = payload;
+            document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
+              if (i === respuestaCorrecta) {
+                btn.classList.add('respuesta-correcta');
+              }
+            });
+          });
+
+
+        // Suscribirse al canal
+        await gameState.channel.subscribe();
+        
+        // Mostrar la pantalla de lobby inmediatamente después de suscribirse
+        console.log('Canal suscrito, mostrando lobby');
         mostrarPantalla(DOM.pantallaLobby);
         DOM.codigoSala.textContent = codigo;
         DOM.adminBadgeLobby.classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Error en crearSala:', error);
+        alert('Error al crear la sala: ' + error.message);
       }
     }
 
+
     // ✅ CORRECCIÓN 1: Agregar await channel.subscribe() en unirseASala
     async function unirseASala(codigo) {
-      gameState.salaId = codigo;
+      try {
+        gameState.salaId = codigo;
 
-      gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
-        config: { broadcast: { self: true } }
-      });
-
-      gameState.channel
-        .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
-          // ✅ CORRECCIÓN 5: Solo actualizar estilos si soy el admin
-          if (gameState.rol === 'admin') {
-            gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
-            actualizarEstilosRespuestas();
-          }
-        })
-        .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
-          console.log('Jugador recibió iniciar-juego:', payload);
-          gameState.categoriaSeleccionada = payload.categoria;
-          gameState.nombresJugadores = payload.nombres;
-
-          // Determinar mi número comparando nombres
-          if (gameState.nombreJugador === gameState.nombresJugadores.jugador1) {
-            gameState.jugadorNumero = 1;
-          } else if (gameState.nombreJugador === gameState.nombresJugadores.jugador2) {
-            gameState.jugadorNumero = 2;
-          }
-
-          console.log('Mi número de jugador:', gameState.jugadorNumero);
-          
-          // ✅ CORRECCIÓN 2: Esperar un poco antes de iniciar el juego
-          setTimeout(() => {
-            iniciarJuegoMultijugador(payload.preguntas);
-          }, 500);
-        })
-        .on('broadcast', { event: 'siguiente-pregunta' }, () => {
-          gameState.preguntaIndex++;
-          mostrarPregunta();
-        })
-        .on('broadcast', { event: 'fin-juego' }, () => {
-          finalizarJuego();
-        })
-        .on('broadcast', { event: 'sala-cancelada' }, () => {
-          alert('La sala ha sido cancelada por el administrador');
-          volverAlInicio();
-        })
-        .on('broadcast', { event: 'sincronizar-tiempo' }, ({ payload }) => {
-          // ✅ CORRECCIÓN 3: Sincronizar tiempo desde el admin
-          gameState.tiempoRestante = payload.tiempo;
-          actualizarCronometroVisual();
+        gameState.channel = supabaseClient.channel(`sala-${codigo}`, {
+          config: { broadcast: { self: true } }
         });
 
-      // ✅ CORRECCIÓN 1: Esperar a que el canal esté suscrito
-      const status = await gameState.channel.subscribe();
-      console.log('Jugador subscribe status:', status);
-      
-      if (status === 'SUBSCRIBED') {
-        console.log('Enviando jugador-conectado con nombre:', gameState.nombreJugador);
+        gameState.channel
+          .on('broadcast', { event: 'respuesta-seleccionada' }, ({ payload }) => {
+            // Solo actualizar estilos si soy el admin
+            if (gameState.rol === 'admin') {
+              gameState.respuestas[`jugador${payload.jugador}`] = payload.respuestaIndex;
+              actualizarEstilosRespuestas();
+            }
+          })
+          .on('broadcast', { event: 'iniciar-juego' }, ({ payload }) => {
+            console.log('Jugador recibió iniciar-juego:', payload);
+            gameState.categoriaSeleccionada = payload.categoria;
+            gameState.nombresJugadores = payload.nombres;
+
+            // Determinar mi número comparando nombres
+            if (gameState.nombreJugador === gameState.nombresJugadores.jugador1) {
+              gameState.jugadorNumero = 1;
+            } else if (gameState.nombreJugador === gameState.nombresJugadores.jugador2) {
+              gameState.jugadorNumero = 2;
+            }
+
+            console.log('Mi número de jugador:', gameState.jugadorNumero);
+            
+            // Esperar un poco antes de iniciar el juego
+            setTimeout(() => {
+              iniciarJuegoMultijugador(payload.preguntas);
+            }, 500);
+          })
+          .on('broadcast', { event: 'siguiente-pregunta' }, () => {
+            gameState.preguntaIndex++;
+            mostrarPregunta();
+          })
+          .on('broadcast', { event: 'fin-juego' }, () => {
+            finalizarJuego();
+          })
+          .on('broadcast', { event: 'sala-cancelada' }, () => {
+            alert('La sala ha sido cancelada por el administrador');
+            volverAlInicio();
+          })
+          .on('broadcast', { event: 'sincronizar-tiempo' }, ({ payload }) => {
+            gameState.tiempoRestante = payload.tiempo;
+            actualizarCronometroVisual();
+          })
+          .on('broadcast', { event: 'mostrar-respuesta-correcta' }, ({ payload }) => {
+            // Jugadores reciben y marcan la respuesta correcta
+            const { respuestaCorrecta } = payload;
+            document.querySelectorAll('.respuesta-btn').forEach((btn, i) => {
+              btn.disabled = true;
+              if (i === respuestaCorrecta) {
+                btn.classList.add('respuesta-correcta');
+              }
+            });
+          });
+
+
+        // Suscribirse al canal
+        await gameState.channel.subscribe();
+        
+        console.log('Jugador suscrito, enviando jugador-conectado');
         
         // Esperar un poco para asegurar que el admin también esté suscrito
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -1075,8 +1100,13 @@
         document.getElementById('textoEspera').textContent =
           'Esperando que el administrador inicie el juego...';
         document.getElementById('loaderEspera').classList.remove('hidden');
+
+      } catch (error) {
+        console.error('Error en unirseASala:', error);
+        alert('Error al unirse a la sala: ' + error.message);
       }
     }
+
 
     // Iniciar juego ADMIN
     DOM.btnIniciarJuego.addEventListener('click', async () => {
@@ -1196,6 +1226,8 @@
       }
 
       const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
+      
+      // ✅ Resetear respuestas
       gameState.respuestas = { jugador1: null, jugador2: null };
 
       DOM.preguntaTexto.textContent = pregunta.question;
@@ -1203,9 +1235,9 @@
         gameState.preguntaIndex + 1
       }/${gameState.preguntasFiltradas.length}`;
 
+      // ✅ Limpiar contenedor de respuestas
       DOM.contenedorRespuestas.innerHTML = '';
 
-      // NO mezclar, usar el orden que viene
       const respuestas = pregunta.answers;
 
       respuestas.forEach((respuesta, i) => {
@@ -1223,9 +1255,13 @@
         DOM.contenedorRespuestas.appendChild(boton);
       });
 
+      // ✅ Ocultar botón siguiente pregunta
       DOM.btnSiguientePregunta.classList.add('hidden');
+      
+      // ✅ Iniciar cronómetro
       iniciarCronometro();
     }
+
 
     function seleccionarRespuesta(index) {
       // ✅ CORRECCIÓN 5: Jugador solo guarda su propia respuesta
@@ -1350,6 +1386,7 @@
       let respuestaCorrecta = null;
       const pregunta = gameState.preguntasFiltradas[gameState.preguntaIndex];
 
+      // Encontrar respuesta correcta
       document.querySelectorAll('.respuesta-btn').forEach((btn) => {
         btn.disabled = true;
         if (btn.dataset.correct === 'true') {
@@ -1357,6 +1394,17 @@
           respuestaCorrecta = parseInt(btn.dataset.index, 10);
         }
       });
+
+      // ✅ Admin envía la respuesta correcta a todos
+      if (gameState.rol === 'admin') {
+        gameState.channel.send({
+          type: 'broadcast',
+          event: 'mostrar-respuesta-correcta',
+          payload: {
+            respuestaCorrecta: respuestaCorrecta
+          }
+        });
+      }
 
       const puntos = gameState.PUNTOS_POR_NIVEL[pregunta.category] || 10;
 
@@ -1371,7 +1419,7 @@
         gameState.respuestasCorrectas.jugador2++;
       }
 
-      // ✅ CORRECCIÓN 4: Jugadores reproducen sus propios sonidos
+      // Jugadores reproducen sus propios sonidos
       if (gameState.rol === 'jugador') {
         if (gameState.respuestas[`jugador${gameState.jugadorNumero}`] === respuestaCorrecta) {
           audioSystem.play('correct');
@@ -1383,18 +1431,33 @@
       DOM.puntosJ1.textContent = gameState.puntajes.jugador1;
       DOM.puntosJ2.textContent = gameState.puntajes.jugador2;
 
+      // ✅ Admin muestra botón después de 3 segundos
       if (gameState.rol === 'admin') {
-        DOM.btnSiguientePregunta.classList.remove('hidden');
+        setTimeout(() => {
+          DOM.btnSiguientePregunta.classList.remove('hidden');
+        }, 3000);
       }
     }
 
+
     DOM.btnSiguientePregunta.addEventListener('click', () => {
+      // Ocultar el botón inmediatamente para evitar doble clic
+      DOM.btnSiguientePregunta.classList.add('hidden');
+      
+      // Incrementar el índice de pregunta
+      gameState.preguntaIndex++;
+      
+      // Enviar evento a los jugadores
       gameState.channel.send({
         type: 'broadcast',
         event: 'siguiente-pregunta',
         payload: {}
       });
+      
+      // Mostrar la siguiente pregunta localmente en el admin
+      mostrarPregunta();
     });
+
 
     function finalizarJuego() {
       detenerCronometro();
