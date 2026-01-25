@@ -1056,9 +1056,15 @@
             gameState.preguntaIndex++;
             mostrarPregunta();
           })
-          .on('broadcast', { event: 'fin-juego' }, () => {
+          .on('broadcast', { event: 'fin-juego' }, ({ payload }) => {
+            // Actualizar los puntajes locales con los datos del admin
+            if (payload && payload.puntajes) {
+              gameState.puntajes = payload.puntajes;
+              gameState.respuestasCorrectas = payload.respuestasCorrectas;
+            }
             finalizarJuego();
           })
+
           .on('broadcast', { event: 'sala-cancelada' }, () => {
             alert('La sala ha sido cancelada por el administrador');
             volverAlInicio();
@@ -1219,9 +1225,11 @@
           gameState.channel.send({
             type: 'broadcast',
             event: 'fin-juego',
-            payload: {}
+            payload: {puntajes: gameState.puntajes,
+                respuestasCorrectas: gameState.respuestasCorrectas}
           });
         }
+        finalizarJuego();
         return;
       }
 
